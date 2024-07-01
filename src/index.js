@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
-import db from "./db/db.js";
+// import db from "./db/db.js";
 import router from "./router/router.js";
 import errorMiddleware from "./error/errorMiddleware.js";
 import cookieParser from "cookie-parser";

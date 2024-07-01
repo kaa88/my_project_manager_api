@@ -1,12 +1,14 @@
-import "@/drizzle/envConfig";
+import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/db/schema.js",
   dialect: "postgresql",
-  driver: "pg",
+  // driver: "pg",
   dbCredentials: {
-    connectionString: process.env.DB_URL,
+    url: process.env.POSTGRES_URL,
+    // connectionString:
+    //   !console.log("------I GOT ENV!!!-----------") && process.env.POSTGRES_URL,
   },
+  schema: "./src/db/schema.js",
   out: "./drizzle",
 });

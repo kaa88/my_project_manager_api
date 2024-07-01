@@ -14,9 +14,12 @@ export const getDefaultRouter = (controller) => {
   const router = express.Router();
 
   router.get("/", controller.get);
-  router.post("/", authMiddleware, controller.create);
-  router.put("/", authMiddleware, controller.update);
-  router.delete("/", authMiddleware, controller.delete);
+  router.post("/", controller.create);
+  router.patch("/", controller.update);
+  router.delete("/", controller.delete);
+  // router.post("/", authMiddleware, controller.create);
+  // router.put("/", authMiddleware, controller.update);
+  // router.delete("/", authMiddleware, controller.delete);
 
   return router;
 };

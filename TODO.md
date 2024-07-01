@@ -13,6 +13,8 @@
 ==================================
 
 # Notes
+"sql-install": "yarn global add vercel@latest && vercel env pull .env.development.local",
+
 
 Архитектура:
 

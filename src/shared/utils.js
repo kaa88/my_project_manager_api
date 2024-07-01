@@ -15,3 +15,13 @@ export const toNumber = (x) => {
   const num = Number(x);
   return isNaN(num) ? 0 : num;
 };
+
+export const shortenText = (string = "", length = 50) => {
+  const suffix = "...";
+
+  if (typeof string !== "string" || typeof length !== "number") return suffix;
+
+  const trimmed = string.trim();
+  if (trimmed.length > length) return trimmed.substring(0, length) + suffix;
+  else return trimmed;
+};

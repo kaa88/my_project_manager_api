@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "sql-update": "drizzle-kit push",
+    "sql-generate-local": "drizzle-kit generate",
+    "sql-migrate-local": "drizzle-kit migrate"
   },
   "dependencies": {
     "@vercel/postgres": "^0.8.0",

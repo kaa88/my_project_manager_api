@@ -1,52 +1,64 @@
-// import { Pool } from "pg";
+import { count, eq, gte, sql } from "drizzle-orm";
+import { checkDbQueryProps, getModelName } from "./generic.js";
+import instance from "./init.js";
 
-// const connectionString = process.env.DB_URL;
+export const db = {
+  async create({ model, values }) {
+    checkDbQueryProps({ model, values });
 
-// const settings = connectionString
-//   ? { connectionString }
-//   : {
-//       user: process.env.DB_USER,
-//       password: process.env.DB_PASSWORD,
-//       host: process.env.DB_HOST,
-//       port: process.env.DB_PORT,
-//       database: process.env.DB_NAME,
-//     };
+    return await instance.insert(model).values(values).returning();
+  },
 
-import { sql } from "@vercel/postgres";
-import { drizzle } from "drizzle-orm/vercel-postgres";
+  async update({ model, values, id }) {
+    checkDbQueryProps({ model, values, id });
 
-export default drizzle(sql);
+    return await instance
+      .update(model)
+      .set(values)
+      .where(eq(model.id, id))
+      .returning();
+  },
 
-// import { drizzle } from 'drizzle-orm/vercel-postgres';
-// import { sql } from "@vercel/postgres";
-// import {
-//   pgTable,
-//   serial,
-//   text,
-//   timestamp,
-//   uniqueIndex,
-// } from 'drizzle-orm/pg-core';
+  async delete({ model, id }) {
+    checkDbQueryProps({ model, id });
 
-// // Use this object to send drizzle queries to your DB
-// export const db = drizzle(sql);
-// // Create a pgTable that maps to a table in your DB
-// export const ExampleTable = pgTable(
-//   'users',
-//   {
-//     id: serial('id').primaryKey(),
-//     name: text('name').notNull(),
-//     email: text('email').notNull(),
-//     image: text('image').notNull(),
-//     createdAt: timestamp('createdAt').defaultNow().notNull(),
-//   },
-//   (users) => {
-//     return {
-//       uniqueIdx: uniqueIndex('unique_idx').on(users.email),
-//     };
-//   },
-// );
+    return await instance.delete(model).where(eq(model.id, id)).returning();
+  },
 
-// export const getExampleTable = async () => {
-//   const selectResult = await db.select().from(ExampleTable);
-//   console.log('Results', selectResult);
-// };
+  async findMany({ model, query }) {
+    return await find({ model, query });
+  },
+
+  async findOne({ model, query }) {
+    return await find({ model, query }, true);
+  },
+
+  async count({ model, query }) {
+    const response = await find({
+      model,
+      query: { ...query, limit: 0, offset: 0, columns: { id: true } },
+    });
+    return response.length;
+  },
+};
+
+const find = async ({ model, query }, one) => {
+  checkDbQueryProps({ model, query });
+
+  const modelName = getModelName(model, instance);
+  // return await instance.query[modelName][one ? "findFirst" : "findMany"](query);
+  // return await instance
+  //   .select([count(model.id)])
+  //   .from(model)
+  //   .groupBy(model.id);
+  return await instance.execute(sql`WITH first_10_rows AS (
+    SELECT *
+    FROM ${model}
+    ORDER BY "id"
+    LIMIT 10
+)
+    SELECT *,
+       COUNT(*) OVER() AS total_count
+FROM first_10_rows;
+`);
+};

@@ -1,9 +1,6 @@
-import { ApiError } from "./error.js";
-
-export default function (err, req, res) {
-  if (err instanceof ApiError)
-    return res
-      .status(err.status)
-      .json({ message: err.message, errors: err.errors });
-  return res.status(500).json({ message: "Unknown error" });
+export default function (err, req, res, next) {
+  const status = err.status || 500;
+  const message = err.message || "Unknown error";
+  console.error(err);
+  return res.status(status).json({ message });
 }
