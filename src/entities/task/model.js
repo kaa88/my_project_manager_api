@@ -6,26 +6,34 @@ import {
   smallint,
   json,
 } from "drizzle-orm/pg-core";
-import { defaultModel } from "../../db/defaultModel.js";
+import { BasicModel } from "../../shared/models/basicModel.js";
 
-// import { files } from "../file";
-
-const table = pgTable("tasks", {
-  ...defaultModel,
+const model = {
   title: text("title"),
   description: text("description"),
   expire: timestamp("expire"),
   priority: smallint("priority").default(0), // 0, 1, 2
   subtasks: json("subtasks"), // array
+};
 
-  // related:
-  // labelId: integer("labelId"),
-  // groupId: integer("groupId"),
-  // creatorId: integer("creatorId"),
-  // assigneeId: integer("assigneeId"),
-  // commentsId: integer("commentsId"),
-  // attachmentsId: integer("attachmentsId"),
-});
+export default pgTable("tasks", { ...new BasicModel(), ...model });
+
+// const table = pgTable("tasks", {
+//   ...basicModel,
+//   title: text("title"),
+//   description: text("description"),
+//   expire: timestamp("expire"),
+//   priority: smallint("priority").default(0), // 0, 1, 2
+//   subtasks: json("subtasks"), // array
+
+// related:
+// labelId: integer("labelId"),
+// groupId: integer("groupId"),
+// creatorId: integer("creatorId"),
+// assigneeId: integer("assigneeId"),
+// commentsId: integer("commentsId"),
+// attachmentsId: integer("attachmentsId"),
+// });
 // id: string;
 // title: string;
 // descr?: string;
@@ -58,4 +66,4 @@ const table = pgTable("tasks", {
 //   attachments: many(files),
 // }));
 
-export default table;
+// export default table;

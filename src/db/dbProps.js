@@ -1,6 +1,5 @@
 import { or, and, eq, asc, desc } from "drizzle-orm";
 import { isArray, isObject } from "../shared/utils.js";
-import { ApiError, Message } from "../error/error.js";
 
 export const checkDbQueryProps = (props) => {
   const required = [];
@@ -22,7 +21,8 @@ export const checkDbQueryProps = (props) => {
 
 const DEFAULT_ORDER_BY = "createdAt";
 
-export const getQueryPaginationProps = ({ model, query }) => {
+// export const queryParser = {
+export const getDbPaginationProps = ({ model, query }) => {
   checkDbQueryProps({ model, query });
 
   const result = {};
@@ -38,7 +38,7 @@ export const getQueryPaginationProps = ({ model, query }) => {
 };
 
 // TODO: search in dates
-export const getQueryWhereProps = ({ model, query, customChunks = [] }) => {
+export const getDbWhereProps = ({ model, query, customChunks = [] }) => {
   checkDbQueryProps({ model, query });
 
   if (!isArray(customChunks))
@@ -56,15 +56,4 @@ export const getQueryWhereProps = ({ model, query, customChunks = [] }) => {
 
   return chunks.length ? { where: operator(...chunks) } : {};
 };
-
-export const getModelName = (model, instance) => {
-  const error = ApiError.internal("Could not find model name");
-  if (!model || !instance?.query) throw error;
-
-  const symbolKeys = Object.getOwnPropertySymbols(model);
-  for (let sym of symbolKeys) {
-    let name = model[sym];
-    if (typeof name === "string" && instance.query[name]) return name;
-  }
-  throw error;
-};
+// };

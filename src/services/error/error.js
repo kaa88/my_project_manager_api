@@ -1,4 +1,4 @@
-import { isArray, isObject, shortenText } from "../shared/utils.js";
+import { isArray, isObject, shortenText } from "../../shared/utils.js";
 
 export class ApiError extends Error {
   constructor(status, message) {
