@@ -5,10 +5,13 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+
 import router from "./router.js";
-import errorMiddleware from "../services/error/errorMiddleware.js";
+
 import authMiddleware from "../services/auth/middleware.js";
 import userRoleMiddleware from "../services/userRoles/middleware.js";
+import routeErrorMiddleware from "../services/error/routeErrorMiddleware.js";
+import errorMiddleware from "../services/error/errorMiddleware.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DOMAIN_BASENAME = process.env.DOMAIN_BASENAME || "";
@@ -34,6 +37,7 @@ app.use(authMiddleware, userRoleMiddleware);
 
 app.use(DOMAIN_BASENAME + "/api", router);
 
+app.use(routeErrorMiddleware);
 app.use(errorMiddleware);
 
 export default app;

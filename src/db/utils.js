@@ -1,4 +1,4 @@
-import { ApiError } from "../services/error/error.js";
+import { ApiError } from "../services/error/apiError.js";
 
 export const getModelName = (model, instance) => {
   const error = ApiError.internal("Could not find model name");

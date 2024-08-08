@@ -1,4 +1,4 @@
-import { ApiError } from "../error/error.js";
+import { ApiError } from "../error/apiError.js";
 
 function userRoleMiddleware(req, res, next) {
   next();
