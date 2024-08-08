@@ -11,6 +11,10 @@ export const isObjectEmpty = (obj) => {
   return true;
 };
 
+export const isDate = (x) =>
+  (typeof x === "string" || typeof x === "number") &&
+  !isNaN(new Date(x).getTime());
+
 export const toNumber = (x) => {
   const num = Number(x);
   return isNaN(num) ? 0 : num;

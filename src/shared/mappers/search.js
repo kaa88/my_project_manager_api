@@ -1,3 +1,11 @@
+export class BasicSearchParams {
+  constructor(data) {
+    this.id = data.id;
+    this.createdAt = data.createdAt;
+    this.updatedAt = data.updatedAt;
+  }
+}
+
 export class SearchParams {
   constructor(params = {}) {
     if (params.search !== undefined) this.search = params.search;
@@ -11,12 +19,6 @@ export class SearchParams {
     //   this.expire = params.expire;
     //   this.priority = params.priority;
     //   this.subtasks = params.subtasks;
-    // this.labelId = params.label;
-    // this.groupId = params.group;
-    // this.creatorId = params.creator;
-    // this.assigneeId = params.assignee;
-    // this.commentsId = params.comments;
-    // this.attachmentsId = params.attachments;
     // }
   }
 }

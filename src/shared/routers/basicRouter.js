@@ -9,9 +9,9 @@ export function BasicRouter(controller) {
   if (controller.create) router.post("/", controller.create);
   if (controller.update) router.patch("/:id", controller.update);
   if (controller.delete) router.delete("/:id", controller.delete);
-  if (controller.findMany) router.get("/", controller.findMany);
   if (controller.findOne) router.get("/:id", controller.findOne);
-  if (controller.search) router.get("/search", controller.search);
+  if (controller.findMany) router.get("/", controller.findMany);
+  // if (controller.search) router.get("/search", controller.search);
 
   return router;
 }

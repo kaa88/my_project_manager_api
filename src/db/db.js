@@ -1,102 +1,82 @@
-import { count, eq, gte, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import instance from "./init.js";
 import {
   checkDbQueryProps,
   getDbPaginationProps,
   getDbWhereProps,
-} from "./dbProps.js";
+} from "./queryProps.js";
 import { getModelName } from "./utils.js";
 
 export const db = {
   async create({ model, values }) {
     checkDbQueryProps({ model, values });
 
-    return await instance.insert(model).values(values).returning();
+    const response = await instance.insert(model).values(values).returning();
+    return response[0];
   },
 
   async update({ model, values, id }) {
     checkDbQueryProps({ model, values, id });
 
-    return await instance
+    const response = await instance
       .update(model)
       .set(values)
       .where(eq(model.id, id))
       .returning();
+    return response[0];
   },
 
   async delete({ model, id }) {
     checkDbQueryProps({ model, id });
 
-    return await instance.delete(model).where(eq(model.id, id)).returning();
-  },
-
-  async findMany({ model, query, customChunks = [] }) {
-    checkDbQueryProps({ model, query });
-
-    const modelName = getModelName(model, instance);
-    const correctQuery = {
-      ...getDbPaginationProps({ query, model }),
-      ...getDbWhereProps({ query, model, customChunks }),
-    };
-
-    return await instance.query[modelName].findMany(correctQuery);
+    const response = await instance
+      .delete(model)
+      .where(eq(model.id, id))
+      .returning();
+    return response[0];
   },
 
   async findOne({ model, query }) {
     checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
+    const dbQuery = getDbWhereProps({ model, query });
 
-    return await instance.query[modelName].findFirst(query);
+    return await instance.query[modelName].findFirst(dbQuery);
   },
-  // async findMany({ model, query }) {
-  //   return await find({ model, query });
-  // },
 
-  // async findOne({ model, query }) {
-  //   return await find({ model, query }, true);
-  // },
-
-  async count({ model, query, customChunks = [] }) {
+  async findMany({ model, query }) {
     checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
-    const correctQuery = {
-      ...getDbWhereProps({ query, model, customChunks }),
-      columns: { id: true },
-      // limit: 0,
-      // offset: 0,
+    const dbQuery = {
+      ...getDbPaginationProps({ model, query }),
+      ...getDbWhereProps({ model, query }),
     };
 
-    const response = await instance.query[modelName].findMany(correctQuery);
-    return response.length;
+    const totalItems = await this.count({ model, query });
+    let response;
+    if (totalItems) {
+      response = await instance.query[modelName].findMany(dbQuery);
+    }
+    return {
+      items: response || [],
+      total: totalItems,
+    };
+  },
 
-    // const response = await find({
-    //   model,
-    //   query: { ...query, limit: 0, offset: 0, columns: { id: true } },
-    // });
+  async count({ model, query }) {
+    checkDbQueryProps({ model, query });
+
+    const modelName = getModelName(model, instance);
+    const dbQuery = {
+      ...getDbWhereProps({ model, query }),
+      columns: { id: true },
+      limit: 0,
+      offset: 0,
+    };
+
+    const response = await instance.query[modelName].findMany(dbQuery);
+    return response.length;
   },
 };
-
-// const find = async ({ model, query }, one) => {
-//   checkDbQueryProps({ model, query });
-
-//   const modelName = getModelName(model, instance);
-
-//   return await instance.query[modelName][one ? "findFirst" : "findMany"](query);
-// return await instance
-//   .select([count(model.id)])
-//   .from(model)
-//   .groupBy(model.id);
-
-//   return await instance.execute(sql`WITH first_10_rows AS (
-//     SELECT *
-//     FROM ${model}
-//     ORDER BY "id"
-//     LIMIT 10
-// )
-//     SELECT *,
-//        COUNT(*) OVER() AS total_count
-// FROM first_10_rows;
-// `);
-// };
