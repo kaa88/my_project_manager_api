@@ -1,6 +1,6 @@
 import { between, eq, ilike } from "drizzle-orm";
-import { isDate } from "../shared/utils.js";
 import { checkDbQueryProps } from "./queryProps.js";
+import { getDateRange } from "./utils.js";
 
 const excludeProps = ["limit", "offset", "order", "orderBy"];
 
@@ -15,10 +15,8 @@ export const getRulesFromQuery = ({ model, query }) => {
     if (type === "number") return eq(model[key], value);
     if (type === "boolean") return eq(model[key], value);
     if (type === "date") {
-      if (isDate(value)) {
-        const [from, to] = getDateRange(value);
-        return between(model[key], new Date(from), new Date(to));
-      }
+      const [from, to] = getDateRange(value);
+      return between(model[key], new Date(from), new Date(to));
     }
     if (type === "json") return;
     if (type === "array") return;
@@ -36,19 +34,6 @@ export const getRulesFromQuery = ({ model, query }) => {
 //     // ...?
 //   });
 // };
-
-const getDateRange = (dateString) => {
-  const shortDateTime = dateString.split(".")[0]; // trim ms
-  const from = isDate(shortDateTime) ? shortDateTime : "0";
-
-  let offset = 1;
-  if (isNaN(from[from.length - offset])) offset++;
-
-  const lastDigit = Number(from[from.length - offset]) + 1;
-  const to = from.slice(0, -1) + lastDigit;
-
-  return [from, to];
-};
 
 ////////////////////////////////////////////////////
 // test column data types
