@@ -20,6 +20,13 @@ export const toNumber = (x) => {
   return isNaN(num) ? 0 : num;
 };
 
+export const getSerialId = (itemsArray) => {
+  if (!isArray(itemsArray)) return 1;
+  return (
+    itemsArray.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1
+  );
+};
+
 export const shortenText = (string = "", length = 50) => {
   const suffix = "...";
 
@@ -28,4 +35,20 @@ export const shortenText = (string = "", length = 50) => {
   const trimmed = string.trim();
   if (trimmed.length > length) return trimmed.substring(0, length) + suffix;
   else return trimmed;
+};
+
+const prependZero = (str) => (str.length < 2 ? `0${str}` : str);
+
+export const getShortDateString = (value) => {
+  if (!isDate(value))
+    throw new Error(
+      `'${value}' is not a date. Expected 'YYYY-MM-DD' format or timestamp.`
+    );
+
+  const date = new Date(value);
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+
+  return `${y}-${prependZero(m.toString())}-${prependZero(d.toString())}`;
 };

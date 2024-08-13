@@ -1,39 +1,38 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  integer,
-  smallint,
-  json,
-} from "drizzle-orm/pg-core";
-import { BasicModel } from "../../shared/models/basicModel.js";
+import { relations, sql } from "drizzle-orm";
+import { pgTable, text, integer, smallint, json } from "drizzle-orm/pg-core";
+import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
+import { tasksToGroups } from "../taskGroup/model.js";
+import { projects } from "../project/model.js";
 
-const model = {
+export const tasks = pgTable("tasks", {
+  ...new BasicProjectElementModel(),
+
   title: text("title"),
   description: text("description"),
-  expire: timestamp("expire"),
-  priority: smallint("priority").default(0), // 0, 1, 2
+  expire: text("expire"), // 'YYYY-MM-DD'
+  priority: smallint("priority").notNull().default(0), // 0, 1, 2
   subtasks: json("subtasks"), // array
-};
+  creatorId: integer("creatorId"), // one
+  assigneeId: integer("assigneeId").array(),
+  taskListId: integer("taskListId").notNull().default(1), // one, required
 
-export default pgTable("tasks", { ...new BasicModel(), ...model });
+  // relations:
+  projectId: integer("projectId"),
+  // taskGroupId - не надо объявлять
+  // commentsId: integer("commentsId"), // ?
+  // attachmentsId: integer("attachmentsId"), // ?
+});
 
-// const table = pgTable("tasks", {
-//   ...basicModel,
-//   title: text("title"),
-//   description: text("description"),
-//   expire: timestamp("expire"),
-//   priority: smallint("priority").default(0), // 0, 1, 2
-//   subtasks: json("subtasks"), // array
+export const tasksRelations = relations(tasks, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [tasks.projectId],
+    references: [projects.id],
+  }),
+  tasksToGroups: many(tasksToGroups),
+}));
 
-// related:
-// labelId: integer("labelId"),
-// groupId: integer("groupId"),
-// creatorId: integer("creatorId"),
-// assigneeId: integer("assigneeId"),
-// commentsId: integer("commentsId"),
-// attachmentsId: integer("attachmentsId"),
-// });
+// export default tasks;
+
 // id: string;
 // title: string;
 // descr?: string;
@@ -48,22 +47,3 @@ export default pgTable("tasks", { ...new BasicModel(), ...model });
 // subtasks?: string; // id of block
 // comments?: string; // id of block
 // attachments?: string[]; // ids
-
-// export const tasksRel = relations(table, ({ one, many }) => ({
-//   label: one(labels, {
-//     fields: [table.labelId],
-//     references: [labels.id],
-//   }),
-//   group: many(groups),
-//   creator: one(users, {
-//     fields: [table.creatorId],
-//     references: [users.id],
-//   }),
-//   assignee: many(users),
-//   comments: many(comments), // ? таблица комментов по одному или пачкой?
-//   // get comments(taskId)
-
-//   attachments: many(files),
-// }));
-
-// export default table;

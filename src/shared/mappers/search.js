@@ -1,8 +1,20 @@
+import { toNumber } from "../utils.js";
+
 export class BasicSearchParams {
-  constructor(data) {
-    this.id = data.id;
+  constructor(data = {}) {
+    if (data.id !== undefined) {
+      const ids = data.id.split(",").map((item) => toNumber(item));
+      this.id = ids.length > 1 ? ids : ids[0];
+    }
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
+  }
+}
+
+export class ProjectElemBasicSearchParams extends BasicSearchParams {
+  constructor(data = {}) {
+    super(data);
+    this.projectId = toNumber(data.projectId);
   }
 }
 

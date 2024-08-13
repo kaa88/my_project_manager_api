@@ -1,6 +1,10 @@
 import { ApiError } from "../error/apiError.js";
 
 function userRoleMiddleware(req, res, next) {
+  const PID = 2;
+  // console.log(req.method, "... injecting projectId =", PID);
+  // req.params.projectId = req.query.projectId = req.body.projectId = PID;
+
   next();
   // try {
   //   let authHeader = req.headers.authorization;

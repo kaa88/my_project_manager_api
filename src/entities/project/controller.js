@@ -1,10 +1,10 @@
 import { BasicController } from "../../shared/controllers/basicController.js";
-import { users } from "./model.js";
-import { Entity } from "./map.js";
+import { projects } from "./model.js";
+// import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 
 export const controller = new BasicController({
-  model: users,
-  entity: Entity,
+  model: projects,
+  // entity: Entity,
   // dto: {
   //   get: GetDTO,
   //   create: CreateDTO,

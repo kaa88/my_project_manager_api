@@ -1,8 +1,8 @@
 import { pgTable, text } from "drizzle-orm/pg-core";
-import { defaultModel } from "../../db/defaultModel.js";
+import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
 
 export const files = pgTable("files", {
-  ...defaultModel,
+  ...new BasicProjectElementModel(),
   path: text("path").notNull().unique(),
   description: text("description"),
 });

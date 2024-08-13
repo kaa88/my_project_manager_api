@@ -1,1 +1,13 @@
-export class BasicEntity {}
+import { toNumber } from "../utils.js";
+
+export class BasicEntity {
+  constructor() {}
+}
+
+export class ProjectElemBasicEntity extends BasicEntity {
+  constructor(data = {}) {
+    super(data);
+    if (data.id !== undefined) this.id = toNumber(data.id);
+    if (data.projectId !== undefined) this.projectId = toNumber(data.projectId);
+  }
+}

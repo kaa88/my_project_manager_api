@@ -1,5 +1,9 @@
 export class BasicDTO {
   constructor(entity) {
+    // temp:
+    this.globalId = entity.globalId;
+    this.projectId = entity.projectId;
+    // /
     this.id = entity.id;
     this.createdAt = entity.createdAt;
     this.updatedAt = entity.updatedAt;

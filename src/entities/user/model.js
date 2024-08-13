@@ -1,24 +1,26 @@
-import { pgTable, text, boolean, integer } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-// import { defaultModel } from "../../shared/models/basicModel.js";
+import {
+  pgTable,
+  text,
+  boolean,
+  integer,
+  timestamp,
+} from "drizzle-orm/pg-core";
+import { BasicModel } from "../../shared/models/basicModel.js";
 
-// export const users = pgTable("users", {
-//   ...defaultModel,
-//   email: text("email").notNull().unique(),
-//   password: text("password").notNull(),
-//   role: text("role").notNull(), // enum
-//   accessToken: text("accessToken"),
-//   refreshToken: text("refreshToken"),
-//   isCookieAccepted: boolean("isCookieAccepted"),
-//   isEmailVerified: boolean("isEmailVerified"),
-//   photo: text("photo"),
-//   // related:
-//   teamId: integer("teamId"),
-// });
+export const users = pgTable("users", {
+  ...new BasicModel(),
 
-// export const usersRelations = relations(users, ({ one }) => ({
-//   invitee: one(users, {
-//     fields: [users.invitedBy],
-//     references: [users.id],
-//   }),
-// }));
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").notNull(), // array | enum?
+  accessToken: text("accessToken"),
+  refreshToken: text("refreshToken"),
+  lastVisitAt: timestamp("lastVisitAt").notNull().defaultNow(),
+  isEmailVerified: boolean("isEmailVerified").default(false),
+  isCookieAccepted: boolean("isCookieAccepted").default(false),
+  firstName: text("firstName"),
+  lastName: text("lastName"),
+  image: text("image"),
+  phone: text("phone"),
+  currentProjectId: integer("currentProjectId"),
+});

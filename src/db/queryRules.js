@@ -1,6 +1,7 @@
-import { between, eq, ilike } from "drizzle-orm";
+import { between, eq, ilike, or } from "drizzle-orm";
 import { checkDbQueryProps } from "./queryProps.js";
 import { getDateRange } from "./utils.js";
+import { isArray } from "../shared/utils.js";
 
 const excludeProps = ["limit", "offset", "order", "orderBy"];
 
@@ -11,17 +12,43 @@ export const getRulesFromQuery = ({ model, query }) => {
     if (value === undefined || excludeProps.includes(key)) return;
 
     const type = model[key].dataType;
+
     if (type === "string") return ilike(model[key], `%${value}%`);
-    if (type === "number") return eq(model[key], value);
+
+    if (type === "number")
+      return isArray(value)
+        ? or(...value.map((v) => eq(model[key], v)))
+        : eq(model[key], value);
+
     if (type === "boolean") return eq(model[key], value);
+
     if (type === "date") {
       const [from, to] = getDateRange(value);
       return between(model[key], new Date(from), new Date(to));
     }
+
     if (type === "json") return;
     if (type === "array") return;
   });
 };
+// export const getRulesFromQuery = ({ model, query }) => {
+//   checkDbQueryProps({ model, query });
+
+//   return Object.entries(query).map(([key, value]) => {
+//     if (value === undefined || excludeProps.includes(key)) return;
+
+//     const type = model[key].dataType;
+//     if (type === "string") return ilike(model[key], `%${value}%`);
+//     if (type === "number") return eq(model[key], value);
+//     if (type === "boolean") return eq(model[key], value);
+//     if (type === "date") {
+//       const [from, to] = getDateRange(value);
+//       return between(model[key], new Date(from), new Date(to));
+//     }
+//     if (type === "json") return;
+//     if (type === "array") return;
+//   });
+// };
 
 // export const getSearchRulesFromQuery = ({ model, query }) => {
 //   checkDbQueryProps({ model, query });

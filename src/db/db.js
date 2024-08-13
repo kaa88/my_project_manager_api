@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import instance from "./init.js";
 import {
   checkDbQueryProps,
@@ -6,6 +5,7 @@ import {
   getDbWhereProps,
 } from "./queryProps.js";
 import { getModelName } from "./utils.js";
+import { getSerialId } from "../shared/utils.js";
 
 export const db = {
   async create({ model, values }) {
@@ -15,24 +15,28 @@ export const db = {
     return response[0];
   },
 
-  async update({ model, values, id }) {
-    checkDbQueryProps({ model, values, id });
+  async update({ model, query, values }) {
+    checkDbQueryProps({ model, query, values });
+
+    const dbQuery = getDbWhereProps({ model, query });
 
     const response = await instance
       .update(model)
       .set(values)
-      .where(eq(model.id, id))
+      .where(dbQuery.where)
       .returning();
     return response[0];
   },
 
-  async delete({ model, id }) {
-    checkDbQueryProps({ model, id });
+  async delete({ model, query }) {
+    checkDbQueryProps({ model, query });
+
+    const dbQuery = getDbWhereProps({ model, query });
 
     const response = await instance
       .delete(model)
-      .where(eq(model.id, id))
-      .returning();
+      .where(dbQuery.where)
+      .returning({ id: model.id });
     return response[0];
   },
 
@@ -78,5 +82,20 @@ export const db = {
 
     const response = await instance.query[modelName].findMany(dbQuery);
     return response.length;
+  },
+
+  async generateId({ model, projectId }) {
+    checkDbQueryProps({ model, projectId });
+
+    const modelName = getModelName(model, instance);
+    const dbQuery = {
+      ...getDbWhereProps({ model, query: { projectId } }),
+      columns: { id: true },
+      limit: 0,
+      offset: 0,
+    };
+
+    const response = await instance.query[modelName].findMany(dbQuery);
+    return getSerialId(response);
   },
 };
