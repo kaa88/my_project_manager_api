@@ -1,13 +1,14 @@
-import { db } from "../../db/db.js";
-import { projects as projectModel } from "../../db/schema.js";
 import { ApiError } from "../../services/error/apiError.js";
 import { Message } from "../../services/error/message.js";
+import { db } from "../../db/db.js";
+import { projects as projectModel } from "../../db/schema.js";
 import {
   BasicDeleteDTO,
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../mappers/basicDTO.js";
 import { ProjectElemBasicEntity } from "../mappers/basicEntity.js";
+import { isObject } from "../utils.js";
 import { BasicController } from "./basicController.js";
 
 export class ProjectElemBasicController extends BasicController {
@@ -27,10 +28,12 @@ export class ProjectElemBasicController extends BasicController {
       dto.delete || BasicDeleteDTO
     );
     this.findOne = new FindOneHandler(model, entity, dto.get || BasicGetDTO);
+    this.findMany = new FindManyHandler(model, this.findMany);
   }
 }
 
-function CreateHandler(model, parentCreateHandler) {
+// TODO: add member check
+function CreateHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
       const projectId = Number(req.body.projectId);
@@ -50,7 +53,7 @@ function CreateHandler(model, parentCreateHandler) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }
 
-    return await parentCreateHandler(req, res, next);
+    return await parentHandler(req, res, next);
   };
 }
 
@@ -76,8 +79,9 @@ function DeleteHandler(model, Entity, DeleteDTO) {
   return async (req, res, next) => {
     try {
       const query = getIdsFromQuery({ ...req.params, ...req.query });
+      const values = { deletedAt: new Date() };
 
-      const response = await db.delete({ model, query });
+      const response = await db.update({ model, values, query });
       if (!response) throw ApiError.notFound(Message.notFound(query));
       return res.json(new DeleteDTO(response));
     } catch (e) {
@@ -100,8 +104,22 @@ function FindOneHandler(model, Entity, GetDTO) {
   };
 }
 
+function FindManyHandler(model, parentHandler) {
+  return async (req, res, next) => {
+    try {
+      const projectId = Number(req.query.projectId);
+      if (!projectId) throw ApiError.badRequest(Message.required("projectId"));
+    } catch (e) {
+      return next(e.isApiError ? e : ApiError.internal(e.message));
+    }
+
+    return await parentHandler(req, res, next);
+  };
+}
+
 const getIdsFromQuery = (query) => {
-  if (!isObject(query)) throw ApiError.internal("'query' must be an Object");
+  if (!isObject(query))
+    throw ApiError.internal(Message.incorrect("query", "object"));
 
   const id = Number(query.id);
   const projectId = Number(query.projectId);

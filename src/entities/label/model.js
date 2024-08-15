@@ -2,17 +2,14 @@ import { relations } from "drizzle-orm";
 import { pgTable, text, integer } from "drizzle-orm/pg-core";
 import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
 
-import { teamsToBoards } from "../_JoinTables/teamsToBoards.js";
 import { projects } from "../project/model.js";
-import { taskLists } from "../taskList/model.js";
 
-export const boards = pgTable("boards", {
+export const labels = pgTable("labels", {
   ...new BasicProjectElementModel(),
 
   title: text("title").notNull(),
   description: text("description"),
-  image: text("image"),
-  listOrder: integer("listOrder").array(),
+  color: text("color"),
   creatorId: integer("creatorId").notNull(),
   // relations:
   projectId: integer("projectId")
@@ -20,11 +17,9 @@ export const boards = pgTable("boards", {
     .references(() => projects.id),
 });
 
-export const boardsRelations = relations(boards, ({ one, many }) => ({
+export const labelsRelations = relations(labels, ({ one }) => ({
   project: one(projects, {
-    fields: [boards.projectId],
+    fields: [labels.projectId],
     references: [projects.id],
   }),
-  taskLists: many(taskLists),
-  teamsToBoards: many(teamsToBoards),
 }));

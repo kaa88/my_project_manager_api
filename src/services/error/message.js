@@ -1,7 +1,7 @@
 import { isArray, isObject, shortenText } from "../../shared/utils.js";
 
 export class Message {
-  static required(fields = []) {
+  static required(fields) {
     return `Missing required properties: ${
       isArray(fields) ? fields.filter((item) => item).join(", ") : fields
     }`;
@@ -21,5 +21,15 @@ export class Message {
           )}`
       )
       .join(", ")}`;
+  }
+
+  static incorrect(key, type) {
+    return `Incorrect data type of '${key}'. Expected ${
+      isArray(type) ? type.filter((item) => item).join(" or ") : type
+    }`;
+  }
+
+  static incorrectIds(key) {
+    return Message.incorrect(key, ["number", "number[]"]);
   }
 }

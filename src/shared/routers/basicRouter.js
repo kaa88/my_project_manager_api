@@ -1,11 +1,13 @@
 import express from "express";
 import { ApiError } from "../../services/error/apiError.js";
+import { Message } from "../../services/error/message.js";
 import { isArray, isObjectEmpty } from "../utils.js";
 
 export function BasicRouter({ controller, omit = [] }) {
   if (isObjectEmpty(controller))
     throw ApiError.internal("No controller provided");
-  if (!isArray(omit)) throw ApiError.internal(`"omit" must be an Array`);
+  if (!isArray(omit))
+    throw ApiError.internal(Message.incorrect("omit", "Array"));
 
   const router = express.Router();
 

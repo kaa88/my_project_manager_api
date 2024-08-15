@@ -1,17 +1,19 @@
 export class BasicDTO {
   constructor(entity) {
-    // temp:
+    // temp for tests:
     this.globalId = entity.globalId;
     this.projectId = entity.projectId;
     // /
     this.id = entity.id;
     this.createdAt = entity.createdAt;
     this.updatedAt = entity.updatedAt;
+    this.deletedAt = entity.deletedAt;
   }
 }
 
 export class BasicGetDTO extends BasicDTO {
-  constructor(entity) {
+  constructor(entity, isShortResult) {
+    // use 'isShortResult' for insecure queries, e.g. if you want to hide some user props from other users
     super(entity);
     // ...specific values
   }

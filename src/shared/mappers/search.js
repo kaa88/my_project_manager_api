@@ -8,6 +8,7 @@ export class BasicSearchParams {
     }
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
+    this.deletedAt = data.deletedAt;
   }
 }
 

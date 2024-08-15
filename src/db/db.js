@@ -55,7 +55,8 @@ export const db = {
     const modelName = getModelName(model, instance);
     const dbQuery = {
       ...getDbPaginationProps({ model, query }),
-      ...getDbWhereProps({ model, query }),
+      ...getDbWhereProps({ model, query, omitDeleted: true }),
+      // with: { tasks: true }, //
     };
 
     const totalItems = await this.count({ model, query });

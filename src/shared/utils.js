@@ -20,6 +20,17 @@ export const toNumber = (x) => {
   return isNaN(num) ? 0 : num;
 };
 
+export const toNumberArray = (value) => {
+  const values = isArray(value) ? value : [value];
+  const numbers = [];
+  for (let item of values) {
+    const num = Number(item);
+    if (isNaN(num)) return null;
+    numbers.push(num);
+  }
+  return numbers;
+};
+
 export const getSerialId = (itemsArray) => {
   if (!isArray(itemsArray)) return 1;
   return (
@@ -37,7 +48,7 @@ export const shortenText = (string = "", length = 50) => {
   else return trimmed;
 };
 
-const prependZero = (str) => (str.length < 2 ? `0${str}` : str);
+export const prependZero = (str) => (str.length < 2 ? `0${str}` : str);
 
 export const getShortDateString = (value) => {
   if (!isDate(value))

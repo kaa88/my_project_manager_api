@@ -1,4 +1,5 @@
 import { ApiError } from "../../services/error/apiError.js";
+import { Message } from "../../services/error/message.js";
 import {
   BasicDeleteDTO,
   BasicGetDTO,
@@ -10,6 +11,7 @@ import {
   isArray,
   isObject,
   toNumber,
+  toNumberArray,
 } from "../../shared/utils.js";
 
 export class Task extends ProjectElemBasicEntity {
@@ -26,33 +28,26 @@ export class Task extends ProjectElemBasicEntity {
 
     if (data.subtasks !== undefined) {
       if (!isArray(data.subtasks))
-        throw ApiError.badRequest("'subtasks' must be an Array");
+        throw ApiError.badRequest(Message.incorrect("subtasks", "Array"));
       this.subtasks = data.subtasks.map((item) => new Subtask(item));
     }
 
     if (data.creatorId !== undefined) this.creatorId = toNumber(data.creatorId);
 
     if (data.assigneeId !== undefined) {
-      this.assigneeId = isArray(data.assigneeId)
-        ? data.assigneeId
-        : [data.assigneeId];
-      this.assigneeId.forEach((item) => {
-        if (typeof item !== "number")
-          throw ApiError.badRequest(
-            "'assigneeId' must be a number or number[]"
-          );
-      });
+      this.assigneeId = toNumberArray(data.assigneeId);
+      if (!this.assigneeId)
+        throw ApiError.badRequest(Message.incorrectIds("assigneeId"));
     }
 
-    if (data.taskGroupId !== undefined) {
-      this.taskGroupId = data.taskGroupId; // ? rel
+    if (data.labels !== undefined) {
+      this.labels = toNumberArray(data.labels);
+      if (!this.labels)
+        throw ApiError.badRequest(Message.incorrectIds("labels"));
     }
 
     if (data.taskListId !== undefined)
       this.taskListId = toNumber(data.taskListId);
-
-    // comment
-    // attachment
   }
 }
 
@@ -67,7 +62,7 @@ export class Subtask {
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
+  constructor(entity, isShortResult) {
     super(entity);
     this.title = entity.title;
     this.description = entity.description;
@@ -76,11 +71,11 @@ export class GetDTO extends BasicGetDTO {
     this.subtasks = entity.subtasks;
     this.creatorId = entity.creatorId;
     this.assigneeId = entity.assigneeId;
-    this.projectId = entity.projectId;
-    this.taskGroupId = entity.taskGroupId;
+    this.labels = entity.labels;
     this.taskListId = entity.taskListId;
-    // this.commentsId = entity.comments;
-    // this.attachmentsId = entity.attachments;
+    // relations:
+    if (entity.comments) this.comments = entity.comments;
+    if (entity.attachments) this.attachments = entity.attachments;
   }
 }
 export class CreateDTO extends GetDTO {

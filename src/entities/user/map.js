@@ -1,40 +1,36 @@
-import { ApiError } from "../../services/error/apiError.js";
 import {
   BasicDeleteDTO,
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
-import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
-import {
-  getShortDateString,
-  isArray,
-  isObject,
-  toNumber,
-} from "../../shared/utils.js";
 
 export class Entity {
   constructor(data = {}) {
     if (data.email !== undefined) this.email = data.email;
     if (data.password !== undefined) this.password = data.password;
     if (data.role !== undefined) this.role = data.role;
+    if (data.isEmailVerified !== undefined)
+      this.isEmailVerified = data.isEmailVerified;
+    if (data.isCookieAccepted !== undefined)
+      this.isCookieAccepted = data.isCookieAccepted;
+    if (data.firstName !== undefined) this.firstName = data.firstName;
+    if (data.lastName !== undefined) this.lastName = data.lastName;
+    if (data.image !== undefined) this.image = data.image;
   }
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
+  constructor(entity, isShortResult) {
     super(entity);
-    this.email = entity.email;
-    this.password = entity.password;
-    this.role = entity.role;
-    // this.priority = entity.priority;
-    // this.subtasks = entity.subtasks;
-    // this.creatorId = entity.creatorId;
-    // this.assigneeId = entity.assigneeId;
-    // this.projectId = entity.projectId;
-    // this.taskGroupId = entity.taskGroupId;
-    // this.taskListId = entity.taskListId;
-    // this.commentsId = entity.comments;
-    // this.attachmentsId = entity.attachments;
+    if (!isShortResult) {
+      this.email = entity.email;
+      this.role = entity.role;
+      this.isEmailVerified = entity.isEmailVerified;
+      this.isCookieAccepted = entity.isCookieAccepted;
+    }
+    this.firstName = entity.firstName;
+    this.lastName = entity.lastName;
+    this.image = entity.image;
   }
 }
 export class CreateDTO extends GetDTO {

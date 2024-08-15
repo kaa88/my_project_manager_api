@@ -40,10 +40,13 @@ export const getDbPaginationProps = ({ model, query }) => {
   return result;
 };
 
-export const getDbWhereProps = ({ model, query }) => {
+export const getDbWhereProps = ({ model, query, omitDeleted }) => {
   // checkDbQueryProps({ model, query });
 
-  let chunks = getRulesFromQuery({ model, query });
+  let chunks = getRulesFromQuery({
+    model,
+    query: omitDeleted ? { ...query, deletedAt: null } : query,
+  });
   chunks = chunks.filter((c) => c);
 
   // const operator = query.search !== undefined ? or : and;

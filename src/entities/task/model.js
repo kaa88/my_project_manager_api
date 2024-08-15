@@ -1,8 +1,11 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { pgTable, text, integer, smallint, json } from "drizzle-orm/pg-core";
 import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
-import { tasksToGroups } from "../taskGroup/model.js";
+
 import { projects } from "../project/model.js";
+import { taskLists } from "../taskList/model.js";
+import { comments } from "../comment/model.js";
+import { files } from "../file/model.js";
 
 export const tasks = pgTable("tasks", {
   ...new BasicProjectElementModel(),
@@ -12,15 +15,16 @@ export const tasks = pgTable("tasks", {
   expire: text("expire"), // 'YYYY-MM-DD'
   priority: smallint("priority").notNull().default(0), // 0, 1, 2
   subtasks: json("subtasks"), // array
-  creatorId: integer("creatorId"), // one
+  creatorId: integer("creatorId").notNull(), // one
   assigneeId: integer("assigneeId").array(),
-  taskListId: integer("taskListId").notNull().default(1), // one, required
-
+  labels: integer("labels").array(),
   // relations:
-  projectId: integer("projectId"),
-  // taskGroupId - не надо объявлять
-  // commentsId: integer("commentsId"), // ?
-  // attachmentsId: integer("attachmentsId"), // ?
+  projectId: integer("projectId")
+    .notNull()
+    .references(() => projects.id),
+  taskListId: integer("taskListId")
+    .notNull()
+    .references(() => taskLists.id),
 });
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
@@ -28,10 +32,13 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
     fields: [tasks.projectId],
     references: [projects.id],
   }),
-  tasksToGroups: many(tasksToGroups),
+  taskList: one(taskLists, {
+    fields: [tasks.taskListId],
+    references: [taskLists.id],
+  }),
+  comments: many(comments),
+  files: many(files),
 }));
-
-// export default tasks;
 
 // id: string;
 // title: string;

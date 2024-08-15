@@ -5,6 +5,7 @@ export class BasicModel {
     this.id = serial("id").primaryKey();
     this.createdAt = timestamp("createdAt").notNull().defaultNow();
     this.updatedAt = timestamp("updatedAt").notNull().defaultNow();
+    this.deletedAt = timestamp("deletedAt");
   }
 }
 

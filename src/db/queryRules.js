@@ -13,7 +13,10 @@ export const getRulesFromQuery = ({ model, query }) => {
 
     const type = model[key].dataType;
 
-    if (type === "string") return ilike(model[key], `%${value}%`);
+    if (type === "string") {
+      if (value === null) return eq(model[key], value);
+      return ilike(model[key], `%${value}%`);
+    }
 
     if (type === "number")
       return isArray(value)
@@ -23,6 +26,7 @@ export const getRulesFromQuery = ({ model, query }) => {
     if (type === "boolean") return eq(model[key], value);
 
     if (type === "date") {
+      if (value === null) return eq(model[key], value);
       const [from, to] = getDateRange(value);
       return between(model[key], new Date(from), new Date(to));
     }

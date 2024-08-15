@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  boolean,
-  integer,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp } from "drizzle-orm/pg-core";
 import { BasicModel } from "../../shared/models/basicModel.js";
 
 export const users = pgTable("users", {
@@ -12,7 +6,7 @@ export const users = pgTable("users", {
 
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull(), // array | enum?
+  role: text("role").notNull(), // array? | enum?
   accessToken: text("accessToken"),
   refreshToken: text("refreshToken"),
   lastVisitAt: timestamp("lastVisitAt").notNull().defaultNow(),
@@ -21,6 +15,4 @@ export const users = pgTable("users", {
   firstName: text("firstName"),
   lastName: text("lastName"),
   image: text("image"),
-  phone: text("phone"),
-  currentProjectId: integer("currentProjectId"),
 });

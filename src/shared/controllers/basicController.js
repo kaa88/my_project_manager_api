@@ -1,6 +1,6 @@
-import { db } from "../../db/db.js";
 import { ApiError } from "../../services/error/apiError.js";
 import { Message } from "../../services/error/message.js";
+import { db } from "../../db/db.js";
 import {
   BasicCreateDTO,
   BasicDeleteDTO,
@@ -74,7 +74,9 @@ function DeleteHandler(model, Entity, DeleteDTO) {
       const id = Number(req.params.id);
       if (!id) throw ApiError.badRequest(Message.required("id"));
 
-      const response = await db.delete({ model, query: { id } });
+      const values = { deletedAt: new Date() };
+
+      const response = await db.update({ model, values, query: { id } });
       if (!response) throw ApiError.notFound(Message.notFound({ id }));
       return res.json(new DeleteDTO(response));
     } catch (e) {
@@ -109,7 +111,7 @@ function FindManyHandler(model, Entity, GetDTO) {
       };
 
       const response = await db.findMany({ model, query });
-      const itemDTOs = response.items.map((item) => new GetDTO(item));
+      const itemDTOs = response.items.map((item) => new GetDTO(item, true));
 
       return res.json(new PaginationDTO(query, itemDTOs, response.total));
     } catch (e) {
