@@ -6,7 +6,7 @@ import {
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
 import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumber, toNumberArray } from "../../shared/utils.js";
+import { toNumberArrayOrNull, toNumberOrNull } from "../../shared/utils.js";
 
 export class Entity extends ProjectElemBasicEntity {
   constructor(data = {}) {
@@ -15,24 +15,20 @@ export class Entity extends ProjectElemBasicEntity {
     if (data.description !== undefined) this.description = data.description;
     if (data.image !== undefined) this.image = data.image;
 
-    if (data.creatorId !== undefined) this.creatorId = toNumber(data.creatorId);
+    if (data.creatorId !== undefined)
+      this.creatorId = toNumberOrNull(data.creatorId);
 
-    if (data.listOrder !== undefined) {
-      this.listOrder = toNumberArray(data.listOrder);
-      if (!this.listOrder)
-        throw ApiError.badRequest(Message.incorrectIds("listOrder"));
-    }
+    if (data.listOrder !== undefined)
+      this.listOrder = toNumberArrayOrNull(data.listOrder);
 
-    if (data.teams !== undefined) {
-      this.teams = toNumberArray(data.teams);
-      if (!this.teams) throw ApiError.badRequest(Message.incorrectIds("teams"));
-    }
+    // rename to teamIds ?
+    if (data.teams !== undefined) this.teams = toNumberArrayOrNull(data.teams);
   }
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
-    super(entity);
+  constructor(entity, isShortResult) {
+    super(entity, isShortResult);
     this.title = entity.title;
     this.description = entity.description;
     this.image = entity.image;

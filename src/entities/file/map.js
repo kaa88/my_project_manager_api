@@ -6,7 +6,7 @@ import {
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
 import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumber } from "../../shared/utils.js";
+import { toNumberOrNull } from "../../shared/utils.js";
 
 export class Entity extends ProjectElemBasicEntity {
   constructor(data = {}) {
@@ -14,17 +14,22 @@ export class Entity extends ProjectElemBasicEntity {
     if (data.title !== undefined) this.title = data.title;
     if (data.description !== undefined) this.description = data.description;
     if (data.path !== undefined) this.path = data.path;
-    if (data.authorId !== undefined) this.authorId = toNumber(data.authorId);
-    if (data.taskId !== undefined) this.taskId = toNumber(data.taskId);
+    if (data.type !== undefined) this.type = data.type;
+    if (data.size !== undefined) this.size = data.size;
+    if (data.authorId !== undefined)
+      this.authorId = toNumberOrNull(data.authorId);
+    if (data.taskId !== undefined) this.taskId = toNumberOrNull(data.taskId);
   }
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
-    super(entity);
+  constructor(entity, isShortResult) {
+    super(entity, isShortResult);
     this.title = entity.title;
     this.description = entity.description;
     this.path = entity.path;
+    this.type = entity.type;
+    this.size = entity.size;
     this.authorId = entity.authorId;
     // relations:
     if (entity.taskId) this.taskId = entity.taskId;

@@ -12,7 +12,7 @@ export const teams = pgTable("teams", {
   description: text("description"),
   image: text("image"),
   leaderId: integer("leaderId").notNull(),
-  members: integer("members").array(),
+  memberIds: integer("memberIds").array(),
   // relations:
   projectId: integer("projectId")
     .notNull()

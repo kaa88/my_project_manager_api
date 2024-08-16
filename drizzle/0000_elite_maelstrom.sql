@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS "files" (
 	"title" text,
 	"description" text,
 	"path" text NOT NULL,
+	"type" text NOT NULL,
+	"size" text NOT NULL,
 	"authorId" integer NOT NULL,
 	"taskId" integer NOT NULL,
 	CONSTRAINT "files_id_unique" UNIQUE("id"),
@@ -72,7 +74,7 @@ CREATE TABLE IF NOT EXISTS "projects" (
 	"title" text NOT NULL,
 	"description" text,
 	"ownerId" integer NOT NULL,
-	"members" integer[]
+	"memberIds" integer[]
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "tasks" (
@@ -88,8 +90,8 @@ CREATE TABLE IF NOT EXISTS "tasks" (
 	"priority" smallint DEFAULT 0 NOT NULL,
 	"subtasks" json,
 	"creatorId" integer NOT NULL,
-	"assigneeId" integer[],
-	"labels" integer[],
+	"assigneeIds" integer[],
+	"labelIds" integer[],
 	"taskListId" integer NOT NULL,
 	CONSTRAINT "tasks_id_unique" UNIQUE("id")
 );
@@ -120,7 +122,7 @@ CREATE TABLE IF NOT EXISTS "teams" (
 	"description" text,
 	"image" text,
 	"leaderId" integer NOT NULL,
-	"members" integer[],
+	"memberIds" integer[],
 	CONSTRAINT "teams_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint

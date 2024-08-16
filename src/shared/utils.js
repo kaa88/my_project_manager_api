@@ -20,16 +20,19 @@ export const toNumber = (x) => {
   return isNaN(num) ? 0 : num;
 };
 
-export const toNumberArray = (value) => {
-  const values = isArray(value) ? value : [value];
-  const numbers = [];
-  for (let item of values) {
-    const num = Number(item);
-    if (isNaN(num)) return null;
-    numbers.push(num);
-  }
-  return numbers;
+export const toNumberArray = (x) => {
+  let arr = isArray(x) ? x : [x];
+  let result = [];
+  arr.forEach((item) => {
+    result = result.concat(typeof item === "string" ? item.split(",") : [item]);
+  });
+  return result.map((item) => toNumber(item));
 };
+
+export const toNumberOrNull = (x) => (x === null ? null : toNumber(x));
+
+export const toNumberArrayOrNull = (x) =>
+  x === null ? null : toNumberArray(x);
 
 export const getSerialId = (itemsArray) => {
   if (!isArray(itemsArray)) return 1;

@@ -2,11 +2,6 @@ import { ApiError } from "../../services/error/apiError.js";
 import { Message } from "../../services/error/message.js";
 import { db } from "../../db/db.js";
 import { projects as projectModel } from "../../db/schema.js";
-import {
-  BasicDeleteDTO,
-  BasicGetDTO,
-  BasicUpdateDTO,
-} from "../mappers/basicDTO.js";
 import { ProjectElemBasicEntity } from "../mappers/basicEntity.js";
 import { isObject } from "../utils.js";
 import { BasicController } from "./basicController.js";
@@ -16,18 +11,9 @@ export class ProjectElemBasicController extends BasicController {
     super({ model, entity, dto });
 
     this.create = new CreateHandler(model, this.create);
-
-    this.update = new UpdateHandler(
-      model,
-      entity,
-      dto.update || BasicUpdateDTO
-    );
-    this.delete = new DeleteHandler(
-      model,
-      entity,
-      dto.delete || BasicDeleteDTO
-    );
-    this.findOne = new FindOneHandler(model, entity, dto.get || BasicGetDTO);
+    this.update = new UpdateHandler(model, this.update);
+    this.delete = new FindOneHandler(model, this.delete); // same handler as findOne
+    this.findOne = new FindOneHandler(model, this.findOne);
     this.findMany = new FindManyHandler(model, this.findMany);
   }
 }
@@ -57,47 +43,19 @@ function CreateHandler(model, parentHandler) {
   };
 }
 
-function UpdateHandler(model, Entity, UpdateDTO) {
+function UpdateHandler(model, parentHandler) {
+  const handle = new FindOneHandler(model, parentHandler);
   return async (req, res, next) => {
-    try {
-      const query = getIdsFromQuery({ ...req.params, ...req.query });
-      delete req.body.id;
-      delete req.body.projectId;
-      const values = new Entity(req.body);
-      values.updatedAt = new Date();
-
-      const response = await db.update({ model, values, query });
-      if (!response) throw ApiError.notFound(Message.notFound(query));
-      return res.json(new UpdateDTO(response, values));
-    } catch (e) {
-      return next(e.isApiError ? e : ApiError.internal(e.message));
-    }
+    delete req.body.projectId;
+    handle(req, res, next);
   };
 }
 
-function DeleteHandler(model, Entity, DeleteDTO) {
+function FindOneHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      const query = getIdsFromQuery({ ...req.params, ...req.query });
-      const values = { deletedAt: new Date() };
-
-      const response = await db.update({ model, values, query });
-      if (!response) throw ApiError.notFound(Message.notFound(query));
-      return res.json(new DeleteDTO(response));
-    } catch (e) {
-      return next(e.isApiError ? e : ApiError.internal(e.message));
-    }
-  };
-}
-
-function FindOneHandler(model, Entity, GetDTO) {
-  return async (req, res, next) => {
-    try {
-      const query = getIdsFromQuery({ ...req.params, ...req.query });
-
-      const response = await db.findOne({ model, query });
-      if (!response) throw ApiError.notFound(Message.notFound(query));
-      return res.json(new GetDTO(response));
+      req.customQuery = getIdsFromQuery({ ...req.params, ...req.query });
+      return await parentHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }

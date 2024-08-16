@@ -1,5 +1,5 @@
 import { or, and, asc, desc } from "drizzle-orm";
-import { isArray, isObject } from "../shared/utils.js";
+import { isArray, isObject, isObjectEmpty } from "../shared/utils.js";
 import { ApiError } from "../services/error/apiError.js";
 import { Message } from "../services/error/message.js";
 import { getRulesFromQuery } from "./queryRules.js";
@@ -40,17 +40,18 @@ export const getDbPaginationProps = ({ model, query }) => {
   return result;
 };
 
-export const getDbWhereProps = ({ model, query, omitDeleted }) => {
+export const getDbWhereProps = ({ model, query }) => {
   // checkDbQueryProps({ model, query });
 
-  let chunks = getRulesFromQuery({
-    model,
-    query: omitDeleted ? { ...query, deletedAt: null } : query,
-  });
+  let chunks = getRulesFromQuery({ model, query });
   chunks = chunks.filter((c) => c);
 
   // const operator = query.search !== undefined ? or : and;
   const operator = and;
 
   return chunks.length ? { where: operator(...chunks) } : {};
+};
+
+export const getDbWithProps = (obj) => {
+  return isObjectEmpty(obj) ? {} : { with: obj };
 };

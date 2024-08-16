@@ -5,29 +5,27 @@ import {
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
-import { toNumber, toNumberArray } from "../../shared/utils.js";
+import { BasicEntity } from "../../shared/mappers/basicEntity.js";
+import { toNumberArrayOrNull, toNumberOrNull } from "../../shared/utils.js";
 
-export class Entity {
+export class Entity extends BasicEntity {
   constructor(data = {}) {
+    super(data);
     if (data.title !== undefined) this.title = data.title;
     if (data.description !== undefined) this.description = data.description;
-    if (data.ownerId !== undefined) this.ownerId = toNumber(data.ownerId);
-
-    if (data.members !== undefined) {
-      this.members = toNumberArray(data.members);
-      if (!this.members)
-        throw ApiError.badRequest(Message.incorrectIds("members"));
-    }
+    if (data.ownerId !== undefined) this.ownerId = toNumberOrNull(data.ownerId);
+    if (data.memberIds !== undefined)
+      this.memberIds = toNumberArrayOrNull(data.memberIds);
   }
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
-    super(entity);
+  constructor(entity, isShortResult) {
+    super(entity, isShortResult);
     this.title = entity.title;
     this.description = entity.description;
     this.ownerId = entity.ownerId;
-    this.members = entity.members;
+    this.memberIds = entity.memberIds;
     // relations:
     if (entity.boards) this.boards = entity.boards;
     if (entity.comments) this.comments = entity.comments;

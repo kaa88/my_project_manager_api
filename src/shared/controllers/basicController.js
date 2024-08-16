@@ -10,6 +10,7 @@ import {
 import { BasicEntity } from "../mappers/basicEntity.js";
 import { PaginationDTO, PaginationParams } from "../mappers/pagination.js";
 import { BasicSearchParams } from "../mappers/search.js";
+import { isObject } from "../utils.js";
 
 export class BasicController {
   constructor({ model, entity = BasicEntity, dto = {} }) {
@@ -53,14 +54,19 @@ function CreateHandler(model, Entity, CreateDTO) {
 function UpdateHandler(model, Entity, UpdateDTO) {
   return async (req, res, next) => {
     try {
-      const id = Number(req.params.id);
-      if (!id) throw ApiError.badRequest(Message.required("id"));
-
+      const query = req.customQuery || getIdsFromQuery(req.params);
+      delete req.body.id;
       const values = new Entity(req.body);
+
+      if (!Object.keys(values).length)
+        throw ApiError.badRequest(
+          "Update failed due to missing or invalid fields"
+        );
+
       values.updatedAt = new Date();
 
-      const response = await db.update({ model, values, query: { id } });
-      if (!response) throw ApiError.notFound(Message.notFound({ id }));
+      const response = await db.update({ model, query, values });
+      if (!response) throw ApiError.notFound(Message.notFound(query));
       return res.json(new UpdateDTO(response, values));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -71,13 +77,14 @@ function UpdateHandler(model, Entity, UpdateDTO) {
 function DeleteHandler(model, Entity, DeleteDTO) {
   return async (req, res, next) => {
     try {
-      const id = Number(req.params.id);
-      if (!id) throw ApiError.badRequest(Message.required("id"));
+      const query = req.customQuery || getIdsFromQuery(req.params);
 
-      const values = { deletedAt: new Date() };
-
-      const response = await db.update({ model, values, query: { id } });
-      if (!response) throw ApiError.notFound(Message.notFound({ id }));
+      const response = await db.update({
+        model,
+        query: { ...query, deletedAt: null },
+        values: { deletedAt: new Date() },
+      });
+      if (!response) throw ApiError.notFound(Message.notFound(query));
       return res.json(new DeleteDTO(response));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -88,11 +95,22 @@ function DeleteHandler(model, Entity, DeleteDTO) {
 function FindOneHandler(model, Entity, GetDTO) {
   return async (req, res, next) => {
     try {
-      const id = Number(req.params.id);
-      if (!id) throw ApiError.badRequest(Message.required("id"));
+      const query = req.customQuery || getIdsFromQuery(req.params);
 
-      const response = await db.findOne({ model, query: { id } });
-      if (!response) throw ApiError.notFound(Message.notFound({ id }));
+      // temp
+      const related = {
+        // boards: { columns: { id: true } },
+        // teams: { columns: { id: true } },
+        // comments: true,
+        // files: true,
+        // labels: true,
+        // tasks: true,
+        // taskLists: true,
+        // teams: true,
+      };
+
+      const response = await db.findOne({ model, query, related });
+      if (!response) throw ApiError.notFound(Message.notFound(query));
       return res.json(new GetDTO(response));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -108,9 +126,10 @@ function FindManyHandler(model, Entity, GetDTO) {
         ...new PaginationParams(params),
         ...new BasicSearchParams(params),
         ...new Entity(params),
+        deletedAt: null,
       };
 
-      const response = await db.findMany({ model, query });
+      let response = await db.findMany({ model, query });
       const itemDTOs = response.items.map((item) => new GetDTO(item, true));
 
       return res.json(new PaginationDTO(query, itemDTOs, response.total));
@@ -119,3 +138,12 @@ function FindManyHandler(model, Entity, GetDTO) {
     }
   };
 }
+
+const getIdsFromQuery = (query) => {
+  if (!isObject(query))
+    throw ApiError.internal(Message.incorrect("query", "object"));
+
+  const id = Number(query.id);
+  if (!id) throw ApiError.badRequest(Message.required("id"));
+  return { id };
+};

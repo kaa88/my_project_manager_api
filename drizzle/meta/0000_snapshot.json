@@ -1,5 +1,5 @@
 {
-  "id": "18f51b5e-5d6c-4ea1-b401-f5409f166ef4",
+  "id": "81fe85d9-7641-41e4-b30e-f403c8647525",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -335,6 +335,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "size": {
+          "name": "size",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "authorId": {
           "name": "authorId",
           "type": "integer",
@@ -537,8 +549,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "members": {
-          "name": "members",
+        "memberIds": {
+          "name": "memberIds",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": false
@@ -628,14 +640,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "assigneeId": {
-          "name": "assigneeId",
+        "assigneeIds": {
+          "name": "assigneeIds",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": false
         },
-        "labels": {
-          "name": "labels",
+        "labelIds": {
+          "name": "labelIds",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": false
@@ -866,8 +878,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "members": {
-          "name": "members",
+        "memberIds": {
+          "name": "memberIds",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": false

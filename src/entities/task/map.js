@@ -11,7 +11,8 @@ import {
   isArray,
   isObject,
   toNumber,
-  toNumberArray,
+  toNumberArrayOrNull,
+  toNumberOrNull,
 } from "../../shared/utils.js";
 
 export class Task extends ProjectElemBasicEntity {
@@ -32,22 +33,17 @@ export class Task extends ProjectElemBasicEntity {
       this.subtasks = data.subtasks.map((item) => new Subtask(item));
     }
 
-    if (data.creatorId !== undefined) this.creatorId = toNumber(data.creatorId);
+    if (data.creatorId !== undefined)
+      this.creatorId = toNumberOrNull(data.creatorId);
 
-    if (data.assigneeId !== undefined) {
-      this.assigneeId = toNumberArray(data.assigneeId);
-      if (!this.assigneeId)
-        throw ApiError.badRequest(Message.incorrectIds("assigneeId"));
-    }
+    if (data.assigneeIds !== undefined)
+      this.assigneeIds = toNumberArrayOrNull(data.assigneeIds);
 
-    if (data.labels !== undefined) {
-      this.labels = toNumberArray(data.labels);
-      if (!this.labels)
-        throw ApiError.badRequest(Message.incorrectIds("labels"));
-    }
+    if (data.labelIds !== undefined)
+      this.labelIds = toNumberArrayOrNull(data.labelIds);
 
     if (data.taskListId !== undefined)
-      this.taskListId = toNumber(data.taskListId);
+      this.taskListId = toNumberOrNull(data.taskListId);
   }
 }
 
@@ -63,15 +59,15 @@ export class Subtask {
 
 export class GetDTO extends BasicGetDTO {
   constructor(entity, isShortResult) {
-    super(entity);
+    super(entity, isShortResult);
     this.title = entity.title;
     this.description = entity.description;
     this.expire = entity.expire;
     this.priority = entity.priority;
     this.subtasks = entity.subtasks;
     this.creatorId = entity.creatorId;
-    this.assigneeId = entity.assigneeId;
-    this.labels = entity.labels;
+    this.assigneeIds = entity.assigneeIds;
+    this.labelIds = entity.labelIds;
     this.taskListId = entity.taskListId;
     // relations:
     if (entity.comments) this.comments = entity.comments;

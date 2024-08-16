@@ -1,11 +1,8 @@
-import { toNumber } from "../utils.js";
+import { toNumber, toNumberArray } from "../utils.js";
 
 export class BasicSearchParams {
   constructor(data = {}) {
-    if (data.id !== undefined) {
-      const ids = data.id.split(",").map((item) => toNumber(item));
-      this.id = ids.length > 1 ? ids : ids[0];
-    }
+    if (data.id !== undefined) this.id = toNumberArray(data.id);
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
     this.deletedAt = data.deletedAt;

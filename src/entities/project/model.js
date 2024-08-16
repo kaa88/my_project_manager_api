@@ -17,7 +17,7 @@ export const projects = pgTable("projects", {
   // systemName: text("systemName"), // ? для вывода в строке браузера, как в gitlab
   description: text("description"),
   ownerId: integer("ownerId").notNull(),
-  members: integer("members").array(),
+  memberIds: integer("memberIds").array(),
 });
 
 export const projectsRelations = relations(projects, ({ many }) => ({

@@ -6,23 +6,24 @@ import {
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
 import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumber } from "../../shared/utils.js";
+import { toNumber, toNumberOrNull } from "../../shared/utils.js";
 
 export class Entity extends ProjectElemBasicEntity {
   constructor(data = {}) {
     super(data);
     if (data.content !== undefined) this.content = data.content;
     if (data.rating !== undefined) this.rating = toNumber(data.rating);
-    if (data.authorId !== undefined) this.authorId = toNumber(data.authorId);
-    if (data.taskId !== undefined) this.taskId = toNumber(data.taskId);
+    if (data.authorId !== undefined)
+      this.authorId = toNumberOrNull(data.authorId);
+    if (data.taskId !== undefined) this.taskId = toNumberOrNull(data.taskId);
     if (data.parentCommentId !== undefined)
-      this.parentCommentId = toNumber(data.parentCommentId);
+      this.parentCommentId = toNumberOrNull(data.parentCommentId);
   }
 }
 
 export class GetDTO extends BasicGetDTO {
-  constructor(entity) {
-    super(entity);
+  constructor(entity, isShortResult) {
+    super(entity, isShortResult);
     this.content = entity.content;
     this.rating = entity.rating;
     this.authorId = entity.authorId;

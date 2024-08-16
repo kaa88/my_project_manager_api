@@ -16,8 +16,8 @@ export const tasks = pgTable("tasks", {
   priority: smallint("priority").notNull().default(0), // 0, 1, 2
   subtasks: json("subtasks"), // array
   creatorId: integer("creatorId").notNull(), // one
-  assigneeId: integer("assigneeId").array(),
-  labels: integer("labels").array(),
+  assigneeIds: integer("assigneeIds").array(),
+  labelIds: integer("labelIds").array(),
   // relations:
   projectId: integer("projectId")
     .notNull()

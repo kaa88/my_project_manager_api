@@ -3,9 +3,11 @@ import {
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
+import { BasicEntity } from "../../shared/mappers/basicEntity.js";
 
-export class Entity {
+export class Entity extends BasicEntity {
   constructor(data = {}) {
+    super(data);
     if (data.email !== undefined) this.email = data.email;
     if (data.password !== undefined) this.password = data.password;
     if (data.role !== undefined) this.role = data.role;
@@ -21,7 +23,7 @@ export class Entity {
 
 export class GetDTO extends BasicGetDTO {
   constructor(entity, isShortResult) {
-    super(entity);
+    super(entity, isShortResult);
     if (!isShortResult) {
       this.email = entity.email;
       this.role = entity.role;

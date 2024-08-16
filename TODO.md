@@ -64,3 +64,6 @@
 - role
 - project id
 - project sys name ?
+- board id
+
+для всего, что в борде, переделать projectId на boardId... и добавлять boadrId в куки

@@ -12,6 +12,7 @@ import authMiddleware from "../services/auth/middleware.js";
 import userRoleMiddleware from "../services/userRoles/middleware.js";
 import routeErrorMiddleware from "../services/error/routeErrorMiddleware.js";
 import errorMiddleware from "../services/error/errorMiddleware.js";
+import nullValueMiddleware from "../services/nullValueMiddleware.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DOMAIN_BASENAME = process.env.DOMAIN_BASENAME || "";
@@ -34,9 +35,8 @@ app.use(
 );
 
 app.use(authMiddleware, userRoleMiddleware);
-
+app.use(nullValueMiddleware);
 app.use(DOMAIN_BASENAME + "/api", router);
-
 app.use(routeErrorMiddleware);
 app.use(errorMiddleware);
 
