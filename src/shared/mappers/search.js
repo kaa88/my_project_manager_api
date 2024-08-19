@@ -9,10 +9,18 @@ export class BasicSearchParams {
   }
 }
 
-export class ProjectElemBasicSearchParams extends BasicSearchParams {
+// не используются в findAll - исправить
+export class ProjectElemSearchParams extends BasicSearchParams {
   constructor(data = {}) {
     super(data);
     this.projectId = toNumber(data.projectId);
+  }
+}
+
+export class BoardElemSearchParams extends ProjectElemSearchParams {
+  constructor(data = {}) {
+    super(data);
+    this.boardId = toNumber(data.boardId);
   }
 }
 

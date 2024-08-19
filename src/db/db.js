@@ -86,12 +86,12 @@ export const db = {
     return response.length;
   },
 
-  async generateId({ model, projectId }) {
-    checkDbQueryProps({ model, projectId });
+  async generateId({ model, query }) {
+    checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
     const dbQuery = {
-      ...getDbWhereProps({ model, query: { projectId } }),
+      ...getDbWhereProps({ model, query }),
       columns: { id: true },
       limit: 0,
       offset: 0,

@@ -1,12 +1,14 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
-import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
+import {
+  BoardElemModel,
+  BoardElemRelations,
+} from "../../shared/models/boardElemModel.js";
 
-import { projects } from "../project/model.js";
 import { tasks } from "../task/model.js";
 
 export const files = pgTable("files", {
-  ...new BasicProjectElementModel(),
+  ...new BoardElemModel(),
 
   title: text("title"),
   description: text("description"),
@@ -15,19 +17,14 @@ export const files = pgTable("files", {
   size: text("size").notNull(),
   authorId: integer("authorId").notNull(),
   // relations:
-  projectId: integer("projectId")
-    .notNull()
-    .references(() => projects.id),
   taskId: integer("taskId")
     .notNull()
     .references(() => tasks.id),
 });
 
 export const filesRelations = relations(files, ({ one }) => ({
-  project: one(projects, {
-    fields: [files.projectId],
-    references: [projects.id],
-  }),
+  ...new BoardElemRelations(files, { one }),
+
   task: one(tasks, {
     fields: [files.taskId],
     references: [tasks.id],

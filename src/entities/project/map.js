@@ -28,11 +28,7 @@ export class GetDTO extends BasicGetDTO {
     this.memberIds = entity.memberIds;
     // relations:
     if (entity.boards) this.boards = entity.boards;
-    if (entity.comments) this.comments = entity.comments;
-    if (entity.files) this.files = entity.files;
     if (entity.labels) this.labels = entity.labels;
-    if (entity.tasks) this.tasks = entity.tasks;
-    if (entity.taskLists) this.taskLists = entity.taskLists;
     if (entity.teams) this.teams = entity.teams;
   }
 }

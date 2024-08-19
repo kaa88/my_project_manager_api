@@ -5,10 +5,10 @@ import {
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
-import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
+import { BoardElemEntity } from "../../shared/mappers/basicEntity.js";
 import { toNumber, toNumberOrNull } from "../../shared/utils.js";
 
-export class Entity extends ProjectElemBasicEntity {
+export class Entity extends BoardElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.content !== undefined) this.content = data.content;

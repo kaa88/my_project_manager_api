@@ -1,20 +1,19 @@
 import { relations } from "drizzle-orm";
 import { pgTable, text, smallint, integer } from "drizzle-orm/pg-core";
-import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
+import {
+  BoardElemModel,
+  BoardElemRelations,
+} from "../../shared/models/boardElemModel.js";
 
-import { projects } from "../project/model.js";
 import { tasks } from "../task/model.js";
 
 export const comments = pgTable("comments", {
-  ...new BasicProjectElementModel(),
+  ...new BoardElemModel(),
 
   content: text("content").notNull(),
   rating: smallint("rating").notNull().default(0),
   authorId: integer("authorId").notNull(),
   // relations:
-  projectId: integer("projectId")
-    .notNull()
-    .references(() => projects.id),
   taskId: integer("taskId")
     .notNull()
     .references(() => tasks.id),
@@ -22,10 +21,8 @@ export const comments = pgTable("comments", {
 });
 
 export const commentsRelations = relations(comments, ({ one }) => ({
-  project: one(projects, {
-    fields: [comments.projectId],
-    references: [projects.id],
-  }),
+  ...new BoardElemRelations(comments, { one }),
+
   task: one(tasks, {
     fields: [comments.taskId],
     references: [tasks.id],

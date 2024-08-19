@@ -5,7 +5,7 @@ import {
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
-import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
+import { BoardElemEntity } from "../../shared/mappers/basicEntity.js";
 import {
   getShortDateString,
   isArray,
@@ -15,7 +15,7 @@ import {
   toNumberOrNull,
 } from "../../shared/utils.js";
 
-export class Task extends ProjectElemBasicEntity {
+export class Task extends BoardElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.title !== undefined) this.title = data.title;

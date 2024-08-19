@@ -3,10 +3,10 @@ import {
   BasicGetDTO,
   BasicUpdateDTO,
 } from "../../shared/mappers/basicDTO.js";
-import { ProjectElemBasicEntity } from "../../shared/mappers/basicEntity.js";
+import { BoardElemEntity } from "../../shared/mappers/basicEntity.js";
 import { toNumberOrNull } from "../../shared/utils.js";
 
-export class Entity extends ProjectElemBasicEntity {
+export class Entity extends BoardElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.title !== undefined) this.title = data.title;

@@ -34,7 +34,6 @@ export const getRulesFromQuery = ({ model, query }) => {
 
     if (type === "array") {
       return arrayContains(column, value);
-      console.log(`----- queryRules cannot handle type '${type}' -----`);
     }
   });
 };

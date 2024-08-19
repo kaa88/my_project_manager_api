@@ -1,13 +1,13 @@
 import { ApiError } from "../../services/error/apiError.js";
 import { Message } from "../../services/error/message.js";
 import { db } from "../../db/db.js";
-import { projects as projectModel } from "../../db/schema.js";
-import { ProjectElemBasicEntity } from "../mappers/basicEntity.js";
+import { boards as boardModel } from "../../entities/board/model.js";
+import { BoardElemEntity } from "../mappers/basicEntity.js";
 import { isObject } from "../utils.js";
-import { BasicController } from "./basicController.js";
+import { ProjectElemController } from "./projectElemController.js";
 
-export class ProjectElemBasicController extends BasicController {
-  constructor({ model, entity = ProjectElemBasicEntity, dto = {} }) {
+export class BoardElemController extends ProjectElemController {
+  constructor({ model, entity = BoardElemEntity, dto = {} }) {
     super({ model, entity, dto });
 
     this.create = new CreateHandler(model, this.create);
@@ -18,35 +18,37 @@ export class ProjectElemBasicController extends BasicController {
   }
 }
 
-// TODO: add member check
 function CreateHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      const projectId = Number(req.body.projectId);
-      if (!projectId) throw ApiError.badRequest(Message.required("projectId"));
+      const { projectId, boardId } = getIdsFromQuery(req.body);
 
-      const project = await db.findOne({
-        model: projectModel,
-        query: { id: projectId },
+      const board = await db.findOne({
+        model: boardModel,
+        query: { id: boardId, projectId },
       });
-      if (!project)
+
+      if (!board || board.deletedAt)
         throw ApiError.badRequest(
-          `Project with id=${projectId} does not exist`
+          `Board with id=${boardId} and projectId=${projectId} does not exist`
         );
 
-      req.body.id = await db.generateId({ model, projectId });
+      req.body.id = await db.generateId({
+        model,
+        query: { projectId, boardId },
+      });
+
+      return await parentHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }
-
-    return await parentHandler(req, res, next);
   };
 }
 
 function UpdateHandler(model, parentHandler) {
   const handle = new FindOneHandler(model, parentHandler);
   return async (req, res, next) => {
-    delete req.body.projectId;
+    delete req.body.boardId;
     handle(req, res, next);
   };
 }
@@ -55,6 +57,7 @@ function FindOneHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
       req.customQuery = getIdsFromQuery({ ...req.params, ...req.query });
+
       return await parentHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -65,27 +68,31 @@ function FindOneHandler(model, parentHandler) {
 function FindManyHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      const projectId = Number(req.query.projectId);
-      if (!projectId) throw ApiError.badRequest(Message.required("projectId"));
+      getIdsFromQuery({ ...req.params, ...req.query }, true);
+
+      return await parentHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }
-
-    return await parentHandler(req, res, next);
   };
 }
 
-const getIdsFromQuery = (query) => {
+const getIdsFromQuery = (query, omitId) => {
   if (!isObject(query))
     throw ApiError.internal(Message.incorrect("query", "object"));
 
-  const id = Number(query.id);
+  const id = omitId ? undefined : Number(query.id);
   const projectId = Number(query.projectId);
+  const boardId = Number(query.boardId);
 
-  if (!id || !projectId)
+  if ((!omitId && !id) || !projectId || !boardId)
     throw ApiError.badRequest(
-      Message.required([!id && "id", !projectId && "projectId"])
+      Message.required([
+        !omitId && !id && "id",
+        !projectId && "projectId",
+        !boardId && "boardId",
+      ])
     );
 
-  return { id, projectId };
+  return { id, projectId, boardId };
 };

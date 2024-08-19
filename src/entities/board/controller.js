@@ -1,8 +1,8 @@
-import { ProjectElemBasicController } from "../../shared/controllers/peBasicController.js";
+import { ProjectElemController } from "../../shared/controllers/projectElemController.js";
 import { boards } from "./model.js";
 import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 
-export const controller = new ProjectElemBasicController({
+export const controller = new ProjectElemController({
   model: boards,
   entity: Entity,
   dto: {

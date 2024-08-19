@@ -1,14 +1,16 @@
 import { relations } from "drizzle-orm";
 import { pgTable, text, integer, smallint, json } from "drizzle-orm/pg-core";
-import { BasicProjectElementModel } from "../../shared/models/basicModel.js";
+import {
+  BoardElemModel,
+  BoardElemRelations,
+} from "../../shared/models/boardElemModel.js";
 
-import { projects } from "../project/model.js";
 import { taskLists } from "../taskList/model.js";
 import { comments } from "../comment/model.js";
 import { files } from "../file/model.js";
 
 export const tasks = pgTable("tasks", {
-  ...new BasicProjectElementModel(),
+  ...new BoardElemModel(),
 
   title: text("title"),
   description: text("description"),
@@ -19,19 +21,14 @@ export const tasks = pgTable("tasks", {
   assigneeIds: integer("assigneeIds").array(),
   labelIds: integer("labelIds").array(),
   // relations:
-  projectId: integer("projectId")
-    .notNull()
-    .references(() => projects.id),
   taskListId: integer("taskListId")
     .notNull()
     .references(() => taskLists.id),
 });
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
-  project: one(projects, {
-    fields: [tasks.projectId],
-    references: [projects.id],
-  }),
+  ...new BoardElemRelations(tasks, { one }),
+
   taskList: one(taskLists, {
     fields: [tasks.taskListId],
     references: [taskLists.id],
