@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1723785309842,
-      "tag": "0000_elite_maelstrom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1724063574694,
-      "tag": "0001_magenta_shaman",
+      "when": 1724066193777,
+      "tag": "0000_famous_ser_duncan",
       "breakpoints": true
     }
   ]

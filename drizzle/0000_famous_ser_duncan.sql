@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS "teams_to_boards" (
+CREATE TABLE IF NOT EXISTS "teamsToBoards" (
 	"teamId" integer NOT NULL,
 	"boardId" integer NOT NULL,
-	CONSTRAINT "teams_to_boards_teamId_boardId_pk" PRIMARY KEY("teamId","boardId")
+	CONSTRAINT "teamsToBoards_teamId_boardId_pk" PRIMARY KEY("teamId","boardId")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "boards" (
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "comments" (
 	"deletedAt" timestamp,
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
+	"boardId" integer NOT NULL,
 	"content" text NOT NULL,
 	"rating" smallint DEFAULT 0 NOT NULL,
 	"authorId" integer NOT NULL,
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS "files" (
 	"deletedAt" timestamp,
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
+	"boardId" integer NOT NULL,
 	"title" text,
 	"description" text,
 	"path" text NOT NULL,
@@ -84,6 +86,7 @@ CREATE TABLE IF NOT EXISTS "tasks" (
 	"deletedAt" timestamp,
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
+	"boardId" integer NOT NULL,
 	"title" text,
 	"description" text,
 	"expire" text,
@@ -96,19 +99,19 @@ CREATE TABLE IF NOT EXISTS "tasks" (
 	CONSTRAINT "tasks_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "task_lists" (
+CREATE TABLE IF NOT EXISTS "taskLists" (
 	"id" integer NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
 	"deletedAt" timestamp,
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
+	"boardId" integer NOT NULL,
 	"title" text,
 	"description" text,
 	"color" text,
 	"creatorId" integer NOT NULL,
-	"boardId" integer NOT NULL,
-	CONSTRAINT "task_lists_id_unique" UNIQUE("id")
+	CONSTRAINT "taskLists_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "teams" (
@@ -146,13 +149,13 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "teams_to_boards" ADD CONSTRAINT "teams_to_boards_teamId_teams_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."teams"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "teamsToBoards" ADD CONSTRAINT "teamsToBoards_teamId_teams_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."teams"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "teams_to_boards" ADD CONSTRAINT "teams_to_boards_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "teamsToBoards" ADD CONSTRAINT "teamsToBoards_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -164,7 +167,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "comments" ADD CONSTRAINT "comments_projectId_projects_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "comments" ADD CONSTRAINT "comments_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -176,7 +179,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "files" ADD CONSTRAINT "files_projectId_projects_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "files" ADD CONSTRAINT "files_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -194,25 +197,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "tasks" ADD CONSTRAINT "tasks_projectId_projects_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "tasks" ADD CONSTRAINT "tasks_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "tasks" ADD CONSTRAINT "tasks_taskListId_task_lists_id_fk" FOREIGN KEY ("taskListId") REFERENCES "public"."task_lists"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "tasks" ADD CONSTRAINT "tasks_taskListId_taskLists_id_fk" FOREIGN KEY ("taskListId") REFERENCES "public"."taskLists"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "task_lists" ADD CONSTRAINT "task_lists_projectId_projects_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "task_lists" ADD CONSTRAINT "task_lists_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "taskLists" ADD CONSTRAINT "taskLists_boardId_boards_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."boards"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

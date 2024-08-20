@@ -7,7 +7,7 @@ import {
 
 import { tasks } from "../task/model.js";
 
-export const taskLists = pgTable("task_lists", {
+export const taskLists = pgTable("taskLists", {
   ...new BoardElemModel(),
 
   title: text("title"),

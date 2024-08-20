@@ -5,7 +5,7 @@ import { teams } from "../team/model.js";
 import { boards } from "../board/model.js";
 
 export const teamsToBoards = pgTable(
-  "teams_to_boards",
+  "teamsToBoards",
   {
     teamId: integer("teamId")
       .notNull()

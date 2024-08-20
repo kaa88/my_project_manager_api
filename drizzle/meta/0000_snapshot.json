@@ -1,11 +1,11 @@
 {
-  "id": "81fe85d9-7641-41e4-b30e-f403c8647525",
+  "id": "8ed5701c-d7a1-45d7-877c-6c10d78aba8c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.teams_to_boards": {
-      "name": "teams_to_boards",
+    "public.teamsToBoards": {
+      "name": "teamsToBoards",
       "schema": "",
       "columns": {
         "teamId": {
@@ -23,9 +23,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "teams_to_boards_teamId_teams_id_fk": {
-          "name": "teams_to_boards_teamId_teams_id_fk",
-          "tableFrom": "teams_to_boards",
+        "teamsToBoards_teamId_teams_id_fk": {
+          "name": "teamsToBoards_teamId_teams_id_fk",
+          "tableFrom": "teamsToBoards",
           "tableTo": "teams",
           "columnsFrom": [
             "teamId"
@@ -36,9 +36,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "teams_to_boards_boardId_boards_id_fk": {
-          "name": "teams_to_boards_boardId_boards_id_fk",
-          "tableFrom": "teams_to_boards",
+        "teamsToBoards_boardId_boards_id_fk": {
+          "name": "teamsToBoards_boardId_boards_id_fk",
+          "tableFrom": "teamsToBoards",
           "tableTo": "boards",
           "columnsFrom": [
             "boardId"
@@ -51,8 +51,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "teams_to_boards_teamId_boardId_pk": {
-          "name": "teams_to_boards_teamId_boardId_pk",
+        "teamsToBoards_teamId_boardId_pk": {
+          "name": "teamsToBoards_teamId_boardId_pk",
           "columns": [
             "teamId",
             "boardId"
@@ -203,6 +203,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "content": {
           "name": "content",
           "type": "text",
@@ -237,12 +243,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "comments_projectId_projects_id_fk": {
-          "name": "comments_projectId_projects_id_fk",
+        "comments_boardId_boards_id_fk": {
+          "name": "comments_boardId_boards_id_fk",
           "tableFrom": "comments",
-          "tableTo": "projects",
+          "tableTo": "boards",
           "columnsFrom": [
-            "projectId"
+            "boardId"
           ],
           "columnsTo": [
             "id"
@@ -317,6 +323,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -362,12 +374,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "files_projectId_projects_id_fk": {
-          "name": "files_projectId_projects_id_fk",
+        "files_boardId_boards_id_fk": {
+          "name": "files_boardId_boards_id_fk",
           "tableFrom": "files",
-          "tableTo": "projects",
+          "tableTo": "boards",
           "columnsFrom": [
-            "projectId"
+            "boardId"
           ],
           "columnsTo": [
             "id"
@@ -603,6 +615,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -661,12 +679,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tasks_projectId_projects_id_fk": {
-          "name": "tasks_projectId_projects_id_fk",
+        "tasks_boardId_boards_id_fk": {
+          "name": "tasks_boardId_boards_id_fk",
           "tableFrom": "tasks",
-          "tableTo": "projects",
+          "tableTo": "boards",
           "columnsFrom": [
-            "projectId"
+            "boardId"
           ],
           "columnsTo": [
             "id"
@@ -674,10 +692,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "tasks_taskListId_task_lists_id_fk": {
-          "name": "tasks_taskListId_task_lists_id_fk",
+        "tasks_taskListId_taskLists_id_fk": {
+          "name": "tasks_taskListId_taskLists_id_fk",
           "tableFrom": "tasks",
-          "tableTo": "task_lists",
+          "tableTo": "taskLists",
           "columnsFrom": [
             "taskListId"
           ],
@@ -699,8 +717,8 @@
         }
       }
     },
-    "public.task_lists": {
-      "name": "task_lists",
+    "public.taskLists": {
+      "name": "taskLists",
       "schema": "",
       "columns": {
         "id": {
@@ -741,6 +759,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -764,32 +788,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
-        },
-        "boardId": {
-          "name": "boardId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "task_lists_projectId_projects_id_fk": {
-          "name": "task_lists_projectId_projects_id_fk",
-          "tableFrom": "task_lists",
-          "tableTo": "projects",
-          "columnsFrom": [
-            "projectId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "task_lists_boardId_boards_id_fk": {
-          "name": "task_lists_boardId_boards_id_fk",
-          "tableFrom": "task_lists",
+        "taskLists_boardId_boards_id_fk": {
+          "name": "taskLists_boardId_boards_id_fk",
+          "tableFrom": "taskLists",
           "tableTo": "boards",
           "columnsFrom": [
             "boardId"
@@ -803,8 +808,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "task_lists_id_unique": {
-          "name": "task_lists_id_unique",
+        "taskLists_id_unique": {
+          "name": "taskLists_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
