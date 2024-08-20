@@ -10,7 +10,7 @@ import {
 import { BasicEntity } from "../mappers/basicEntity.js";
 import { PaginationDTO, PaginationParams } from "../mappers/pagination.js";
 import { BasicSearchParams } from "../mappers/search.js";
-import { isObject } from "../utils.js";
+import { getIdsFromQuery } from "./utils.js";
 
 export class BasicController {
   constructor({ model, entity = BasicEntity, dto = {} }) {
@@ -40,7 +40,7 @@ export class BasicController {
 function CreateHandler(model, Entity, CreateDTO) {
   return async (req, res, next) => {
     try {
-      const values = new Entity(req.body);
+      const values = new Entity(req.api.values);
 
       const response = await db.create({ model, values });
       if (!response) throw ApiError.internal("Database error");
@@ -54,9 +54,10 @@ function CreateHandler(model, Entity, CreateDTO) {
 function UpdateHandler(model, Entity, UpdateDTO) {
   return async (req, res, next) => {
     try {
-      const query = req.customQuery || getIdsFromQuery(req.params);
-      delete req.body.id;
-      const values = new Entity(req.body);
+      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
+      const query = req.api.shortQuery;
+      delete req.api.values.id;
+      const values = new Entity(req.api.values);
 
       if (!Object.keys(values).length)
         throw ApiError.badRequest(
@@ -77,7 +78,8 @@ function UpdateHandler(model, Entity, UpdateDTO) {
 function DeleteHandler(model, Entity, DeleteDTO) {
   return async (req, res, next) => {
     try {
-      const query = req.customQuery || getIdsFromQuery(req.params);
+      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
+      const query = req.api.shortQuery;
 
       const response = await db.update({
         model,
@@ -95,7 +97,8 @@ function DeleteHandler(model, Entity, DeleteDTO) {
 function FindOneHandler(model, Entity, GetDTO) {
   return async (req, res, next) => {
     try {
-      const query = req.customQuery || getIdsFromQuery(req.params);
+      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
+      const query = req.api.shortQuery;
 
       // temp
       const related = {
@@ -121,7 +124,7 @@ function FindOneHandler(model, Entity, GetDTO) {
 function FindManyHandler(model, Entity, GetDTO) {
   return async (req, res, next) => {
     try {
-      const params = req.query;
+      const params = req.api.query;
       const query = {
         ...new PaginationParams(params),
         ...new BasicSearchParams(params),
@@ -138,12 +141,3 @@ function FindManyHandler(model, Entity, GetDTO) {
     }
   };
 }
-
-const getIdsFromQuery = (query) => {
-  if (!isObject(query))
-    throw ApiError.internal(Message.incorrect("query", "object"));
-
-  const id = Number(query.id);
-  if (!id) throw ApiError.badRequest(Message.required("id"));
-  return { id };
-};

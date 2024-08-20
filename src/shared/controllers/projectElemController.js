@@ -1,10 +1,9 @@
 import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
 import { db } from "../../db/db.js";
 import { projects as projectModel } from "../../entities/project/model.js";
 import { ProjectElemEntity } from "../mappers/basicEntity.js";
-import { isObject } from "../utils.js";
 import { BasicController } from "./basicController.js";
+import { checkIdsInQuery, getIdsFromQuery } from "./utils.js";
 
 export class ProjectElemController extends BasicController {
   constructor({ model, entity = ProjectElemEntity, dto = {} }) {
@@ -21,7 +20,7 @@ export class ProjectElemController extends BasicController {
 function CreateHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      const { projectId } = getIdsFromQuery(req.body);
+      const { projectId } = getIdsFromQuery(["projectId"], req.api.query);
 
       const project = await db.findOne({
         model: projectModel,
@@ -32,7 +31,7 @@ function CreateHandler(model, parentHandler) {
           `Project with id=${projectId} does not exist`
         );
 
-      req.body.id = await db.generateId({ model, query: { projectId } });
+      req.api.values.id = await db.generateId({ model, query: { projectId } });
 
       return await parentHandler(req, res, next);
     } catch (e) {
@@ -44,7 +43,7 @@ function CreateHandler(model, parentHandler) {
 function UpdateHandler(model, parentHandler) {
   const handle = new FindOneHandler(model, parentHandler);
   return async (req, res, next) => {
-    delete req.body.projectId;
+    delete req.api.values.projectId;
     handle(req, res, next);
   };
 }
@@ -52,7 +51,10 @@ function UpdateHandler(model, parentHandler) {
 function FindOneHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      req.customQuery = getIdsFromQuery({ ...req.params, ...req.query });
+      req.api.shortQuery.projectId = getIdsFromQuery(
+        ["id", "projectId"],
+        req.api.query
+      ).projectId;
 
       return await parentHandler(req, res, next);
     } catch (e) {
@@ -64,7 +66,7 @@ function FindOneHandler(model, parentHandler) {
 function FindManyHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      getIdsFromQuery({ ...req.params, ...req.query }, true);
+      checkIdsInQuery(["projectId"], req.api.query);
 
       return await parentHandler(req, res, next);
     } catch (e) {
@@ -72,18 +74,3 @@ function FindManyHandler(model, parentHandler) {
     }
   };
 }
-
-const getIdsFromQuery = (query, omitId) => {
-  if (!isObject(query))
-    throw ApiError.internal(Message.incorrect("query", "object"));
-
-  const id = omitId ? undefined : Number(query.id);
-  const projectId = Number(query.projectId);
-
-  if ((!omitId && !id) || !projectId)
-    throw ApiError.badRequest(
-      Message.required([!omitId && !id && "id", !projectId && "projectId"])
-    );
-
-  return { id, projectId };
-};

@@ -1,10 +1,9 @@
 import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
 import { db } from "../../db/db.js";
 import { boards as boardModel } from "../../entities/board/model.js";
 import { BoardElemEntity } from "../mappers/basicEntity.js";
-import { isObject } from "../utils.js";
 import { ProjectElemController } from "./projectElemController.js";
+import { checkIdsInQuery, getIdsFromQuery } from "./utils.js";
 
 export class BoardElemController extends ProjectElemController {
   constructor({ model, entity = BoardElemEntity, dto = {} }) {
@@ -21,7 +20,10 @@ export class BoardElemController extends ProjectElemController {
 function CreateHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      const { projectId, boardId } = getIdsFromQuery(req.body);
+      const { projectId, boardId } = getIdsFromQuery(
+        ["projectId", "boardId"],
+        req.api.query
+      );
 
       const board = await db.findOne({
         model: boardModel,
@@ -33,7 +35,7 @@ function CreateHandler(model, parentHandler) {
           `Board with id=${boardId} and projectId=${projectId} does not exist`
         );
 
-      req.body.id = await db.generateId({
+      req.api.values.id = await db.generateId({
         model,
         query: { projectId, boardId },
       });
@@ -48,7 +50,7 @@ function CreateHandler(model, parentHandler) {
 function UpdateHandler(model, parentHandler) {
   const handle = new FindOneHandler(model, parentHandler);
   return async (req, res, next) => {
-    delete req.body.boardId;
+    delete req.api.values.boardId;
     handle(req, res, next);
   };
 }
@@ -56,7 +58,10 @@ function UpdateHandler(model, parentHandler) {
 function FindOneHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      req.customQuery = getIdsFromQuery({ ...req.params, ...req.query });
+      req.api.shortQuery.boardId = getIdsFromQuery(
+        ["id", "projectId", "boardId"],
+        req.api.query
+      ).boardId;
 
       return await parentHandler(req, res, next);
     } catch (e) {
@@ -68,7 +73,7 @@ function FindOneHandler(model, parentHandler) {
 function FindManyHandler(model, parentHandler) {
   return async (req, res, next) => {
     try {
-      getIdsFromQuery({ ...req.params, ...req.query }, true);
+      checkIdsInQuery(["projectId", "boardId"], req.api.query);
 
       return await parentHandler(req, res, next);
     } catch (e) {
@@ -76,23 +81,3 @@ function FindManyHandler(model, parentHandler) {
     }
   };
 }
-
-const getIdsFromQuery = (query, omitId) => {
-  if (!isObject(query))
-    throw ApiError.internal(Message.incorrect("query", "object"));
-
-  const id = omitId ? undefined : Number(query.id);
-  const projectId = Number(query.projectId);
-  const boardId = Number(query.boardId);
-
-  if ((!omitId && !id) || !projectId || !boardId)
-    throw ApiError.badRequest(
-      Message.required([
-        !omitId && !id && "id",
-        !projectId && "projectId",
-        !boardId && "boardId",
-      ])
-    );
-
-  return { id, projectId, boardId };
-};
