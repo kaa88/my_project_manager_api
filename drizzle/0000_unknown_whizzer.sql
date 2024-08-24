@@ -76,7 +76,8 @@ CREATE TABLE IF NOT EXISTS "projects" (
 	"title" text NOT NULL,
 	"description" text,
 	"ownerId" integer NOT NULL,
-	"memberIds" integer[]
+	"adminIds" integer[],
+	"memberIds" integer[] NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "tasks" (
@@ -87,7 +88,7 @@ CREATE TABLE IF NOT EXISTS "tasks" (
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
 	"boardId" integer NOT NULL,
-	"title" text,
+	"title" text NOT NULL,
 	"description" text,
 	"expire" text,
 	"priority" smallint DEFAULT 0 NOT NULL,
@@ -107,7 +108,7 @@ CREATE TABLE IF NOT EXISTS "taskLists" (
 	"globalId" serial PRIMARY KEY NOT NULL,
 	"projectId" integer NOT NULL,
 	"boardId" integer NOT NULL,
-	"title" text,
+	"title" text NOT NULL,
 	"description" text,
 	"color" text,
 	"creatorId" integer NOT NULL,
@@ -125,7 +126,7 @@ CREATE TABLE IF NOT EXISTS "teams" (
 	"description" text,
 	"image" text,
 	"leaderId" integer NOT NULL,
-	"memberIds" integer[],
+	"memberIds" integer[] NOT NULL,
 	CONSTRAINT "teams_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint

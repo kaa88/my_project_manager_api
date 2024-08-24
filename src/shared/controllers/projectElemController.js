@@ -17,10 +17,10 @@ export class ProjectElemController extends BasicController {
   }
 }
 
-function CreateHandler(model, parentHandler) {
+function CreateHandler(model, protoHandler) {
   return async (req, res, next) => {
     try {
-      const { projectId } = getIdsFromQuery(["projectId"], req.api.query);
+      const { projectId } = getIdsFromQuery(["projectId"], req.body);
 
       const project = await db.findOne({
         model: projectModel,
@@ -31,44 +31,45 @@ function CreateHandler(model, parentHandler) {
           `Project with id=${projectId} does not exist`
         );
 
-      req.api.values.id = await db.generateId({ model, query: { projectId } });
+      req.body.id = await db.generateId({ model, query: { projectId } });
 
-      return await parentHandler(req, res, next);
+      return await protoHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }
   };
 }
 
-function UpdateHandler(model, parentHandler) {
-  const handle = new FindOneHandler(model, parentHandler);
+function UpdateHandler(model, protoHandler) {
+  const handle = new FindOneHandler(model, protoHandler);
   return async (req, res, next) => {
-    delete req.api.values.projectId;
+    delete req.body.projectId;
     handle(req, res, next);
   };
 }
 
-function FindOneHandler(model, parentHandler) {
+function FindOneHandler(model, protoHandler) {
   return async (req, res, next) => {
     try {
-      req.api.shortQuery.projectId = getIdsFromQuery(
-        ["id", "projectId"],
-        req.api.query
-      ).projectId;
+      req.queryIds = req.queryIds || {};
+      req.queryIds.projectId = getIdsFromQuery(["id", "projectId"], {
+        ...req.query,
+        ...req.params,
+      }).projectId;
 
-      return await parentHandler(req, res, next);
+      return await protoHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }
   };
 }
 
-function FindManyHandler(model, parentHandler) {
+function FindManyHandler(model, protoHandler) {
   return async (req, res, next) => {
     try {
-      checkIdsInQuery(["projectId"], req.api.query);
+      checkIdsInQuery(["projectId"], req.query);
 
-      return await parentHandler(req, res, next);
+      return await protoHandler(req, res, next);
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
     }

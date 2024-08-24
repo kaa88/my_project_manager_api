@@ -1,5 +1,5 @@
 {
-  "id": "8ed5701c-d7a1-45d7-877c-6c10d78aba8c",
+  "id": "f037e6e2-7fdc-4cf2-9123-977be4ed0cc4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -561,11 +561,17 @@
           "primaryKey": false,
           "notNull": true
         },
+        "adminIds": {
+          "name": "adminIds",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": false
+        },
         "memberIds": {
           "name": "memberIds",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -625,7 +631,7 @@
           "name": "title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
@@ -769,7 +775,7 @@
           "name": "title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
@@ -887,7 +893,7 @@
           "name": "memberIds",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

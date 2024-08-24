@@ -1,10 +1,10 @@
 import { ApiError } from "../../services/error/apiError.js";
 import { Message } from "../../services/error/message.js";
 import {
-  BasicDeleteDTO,
-  BasicGetDTO,
-  BasicUpdateDTO,
-} from "../../shared/mappers/basicDTO.js";
+  ProjectElemDeleteDTO,
+  ProjectElemGetDTO,
+  ProjectElemUpdateDTO,
+} from "../../shared/mappers/projectElemDTO.js";
 import { ProjectElemEntity } from "../../shared/mappers/basicEntity.js";
 import { toNumberArrayOrNull, toNumberOrNull } from "../../shared/utils.js";
 
@@ -23,7 +23,7 @@ export class Entity extends ProjectElemEntity {
   }
 }
 
-export class GetDTO extends BasicGetDTO {
+export class GetDTO extends ProjectElemGetDTO {
   constructor(entity, isShortResult) {
     super(entity, isShortResult);
     this.title = entity.title;
@@ -42,10 +42,10 @@ export class CreateDTO extends GetDTO {
   }
 }
 
-export class UpdateDTO extends BasicUpdateDTO {
+export class UpdateDTO extends ProjectElemUpdateDTO {
   constructor(entity, updatedEntityValues = {}) {
     super(entity, updatedEntityValues, GetDTO);
   }
 }
 
-export const DeleteDTO = BasicDeleteDTO;
+export const DeleteDTO = ProjectElemDeleteDTO;

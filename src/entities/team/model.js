@@ -14,7 +14,7 @@ export const teams = pgTable("teams", {
   description: text("description"),
   image: text("image"),
   leaderId: integer("leaderId").notNull(),
-  memberIds: integer("memberIds").array(),
+  memberIds: integer("memberIds").array().notNull(),
 });
 
 export const teamsRelations = relations(teams, ({ one, many }) => ({

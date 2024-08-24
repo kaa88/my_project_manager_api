@@ -32,4 +32,12 @@ export class Message {
   static incorrectIds(key) {
     return Message.incorrect(key, ["number", "number[]"]);
   }
+
+  static unauthorized() {
+    return "Unauthorized";
+  }
+
+  static forbidden() {
+    return "You cannot perform this operation because you do not have the correct role or you are not the owner";
+  }
 }

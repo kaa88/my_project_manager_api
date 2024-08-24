@@ -12,7 +12,7 @@ import { files } from "../file/model.js";
 export const tasks = pgTable("tasks", {
   ...new BoardElemModel(),
 
-  title: text("title"),
+  title: text("title").notNull(),
   description: text("description"),
   expire: text("expire"), // 'YYYY-MM-DD'
   priority: smallint("priority").notNull().default(0), // 0, 1, 2

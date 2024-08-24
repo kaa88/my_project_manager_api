@@ -1,9 +1,9 @@
 export class BasicDTO {
   constructor(entity, isShortResult) {
     // temp for tests:
-    this.globalId = entity.globalId;
-    this.projectId = entity.projectId;
-    this.boardId = entity.boardId;
+    // this.globalId = entity.globalId;
+    // this.projectId = entity.projectId;
+    // this.boardId = entity.boardId;
     // /
     this.id = entity.id;
     if (!isShortResult) {

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "start": "nodemon src/index.js",
     "sql-update": "drizzle-kit generate && drizzle-kit push"
   },
   "dependencies": {

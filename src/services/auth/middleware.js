@@ -2,7 +2,18 @@ import { ApiError } from "../error/apiError.js";
 import TokenService from "./TokenService.js";
 
 function authMiddleware(req, res, next) {
-  next();
+  // если MW вЫключен - будет undefined
+  // если включен - userId из кук или null
+
+  // check env
+  // parse cookies
+  req.user = {
+    userId: 2,
+    projectId: 2,
+    boardId: 2,
+    // role: USER_ROLE.user,
+  };
+
   // try {
   //   let authHeader = req.headers.authorization;
   //   if (!authHeader) throw "er";
@@ -18,6 +29,7 @@ function authMiddleware(req, res, next) {
   // } catch (er) {
   //   return next(ApiError.unauthorized());
   // }
+  next();
 }
 
 export default authMiddleware;

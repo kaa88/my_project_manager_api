@@ -40,10 +40,13 @@ export class BasicController {
 function CreateHandler(model, Entity, CreateDTO) {
   return async (req, res, next) => {
     try {
-      const values = new Entity(req.api.values);
+      const values = new Entity(req.body);
 
       const response = await db.create({ model, values });
       if (!response) throw ApiError.internal("Database error");
+
+      if (res.beforeSendCallback) res.beforeSendCallback(response);
+
       return res.json(new CreateDTO(response));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -54,10 +57,10 @@ function CreateHandler(model, Entity, CreateDTO) {
 function UpdateHandler(model, Entity, UpdateDTO) {
   return async (req, res, next) => {
     try {
-      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
-      const query = req.api.shortQuery;
-      delete req.api.values.id;
-      const values = new Entity(req.api.values);
+      const query = getQueryIds(req);
+
+      delete req.body.id;
+      const values = new Entity(req.body);
 
       if (!Object.keys(values).length)
         throw ApiError.badRequest(
@@ -68,6 +71,9 @@ function UpdateHandler(model, Entity, UpdateDTO) {
 
       const response = await db.update({ model, query, values });
       if (!response) throw ApiError.notFound(Message.notFound(query));
+
+      if (res.beforeSendCallback) res.beforeSendCallback(response);
+
       return res.json(new UpdateDTO(response, values));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -78,8 +84,7 @@ function UpdateHandler(model, Entity, UpdateDTO) {
 function DeleteHandler(model, Entity, DeleteDTO) {
   return async (req, res, next) => {
     try {
-      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
-      const query = req.api.shortQuery;
+      const query = getQueryIds(req);
 
       const response = await db.update({
         model,
@@ -87,6 +92,9 @@ function DeleteHandler(model, Entity, DeleteDTO) {
         values: { deletedAt: new Date() },
       });
       if (!response) throw ApiError.notFound(Message.notFound(query));
+
+      if (res.beforeSendCallback) res.beforeSendCallback(response);
+
       return res.json(new DeleteDTO(response));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -97,11 +105,11 @@ function DeleteHandler(model, Entity, DeleteDTO) {
 function FindOneHandler(model, Entity, GetDTO) {
   return async (req, res, next) => {
     try {
-      req.api.shortQuery.id = getIdsFromQuery(["id"], req.api.query).id;
-      const query = req.api.shortQuery;
+      const query = { ...new Entity(req.query), ...getQueryIds(req) };
 
       // temp
       const related = {
+        project: true,
         // boards: { columns: { id: true } },
         // teams: { columns: { id: true } },
         // comments: true,
@@ -114,6 +122,9 @@ function FindOneHandler(model, Entity, GetDTO) {
 
       const response = await db.findOne({ model, query, related });
       if (!response) throw ApiError.notFound(Message.notFound(query));
+
+      if (res.beforeSendCallback) res.beforeSendCallback(response);
+
       return res.json(new GetDTO(response));
     } catch (e) {
       return next(e.isApiError ? e : ApiError.internal(e.message));
@@ -124,11 +135,10 @@ function FindOneHandler(model, Entity, GetDTO) {
 function FindManyHandler(model, Entity, GetDTO) {
   return async (req, res, next) => {
     try {
-      const params = req.api.query;
       const query = {
-        ...new PaginationParams(params),
-        ...new BasicSearchParams(params),
-        ...new Entity(params),
+        ...new PaginationParams(req.query),
+        ...new BasicSearchParams(req.query),
+        ...new Entity(req.query),
         deletedAt: null,
       };
 
@@ -141,3 +151,9 @@ function FindManyHandler(model, Entity, GetDTO) {
     }
   };
 }
+
+const getQueryIds = (req) => {
+  req.queryIds = req.queryIds || {};
+  req.queryIds.id = getIdsFromQuery(["id"], { ...req.query, ...req.params }).id;
+  return req.queryIds;
+};
