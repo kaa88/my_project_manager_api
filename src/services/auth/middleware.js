@@ -1,35 +1,41 @@
-import { ApiError } from "../error/apiError.js";
+import { ApiError } from "../error/index.js";
 import TokenService from "./TokenService.js";
 
 function authMiddleware(req, res, next) {
-  // если MW вЫключен - будет undefined
-  // если включен - userId из кук или null
+  req.user = {};
+  try {
+    if (process.env.USE_AUTHORIZATION === "true") {
+      const authHeader = req.headers.authorization;
+      if (!authHeader)
+        throw ApiError.unauthorized("Authorization token was not provided");
 
-  // check env
-  // parse cookies
-  req.user = {
-    userId: 2,
-    projectId: 2,
-    boardId: 2,
-    // role: USER_ROLE.user,
-  };
+      const accessToken = authHeader.split(" ")[1];
+      if (!accessToken)
+        throw ApiError.unauthorized("Authorization token was not provided");
 
-  // try {
-  //   let authHeader = req.headers.authorization;
-  //   if (!authHeader) throw "er";
+      const tokenData = TokenService.validateAccessToken(accessToken);
+      if (tokenData instanceof Error)
+        throw ApiError.unauthorized("Invalid access token"); //?
 
-  //   let accessToken = authHeader.split(" ")[1];
-  //   if (!accessToken) throw "er";
+      req.user = {
+        id: Number(tokenData.user_id),
+        // projectId: tokenData.project_id,
+        // boardId: tokenData.board_id,
+      };
+    } else {
+      req.user = {
+        id: Number(req.query.userId), // || 2, //
+        // projectId: req.body.projectId || req.query.projectId,
+        // boardId: req.body.boardId || req.query.boardId,
+      };
+    }
 
-  //   let tokenData = TokenService.validateAccessToken(accessToken);
-  //   if (tokenData instanceof Error) throw "er";
+    if (!req.user.id) throw ApiError.unauthorized("User ID was not provided");
 
-  //   req.tokenData = tokenData;
-  //   next();
-  // } catch (er) {
-  //   return next(ApiError.unauthorized());
-  // }
-  next();
+    next();
+  } catch (e) {
+    return next(e.isApiError ? e : ApiError.internal(e.message));
+  }
 }
 
 export default authMiddleware;

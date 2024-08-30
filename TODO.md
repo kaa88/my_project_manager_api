@@ -9,6 +9,14 @@
 - в табл teamsToBoards тоже надо добавить projectId?
 - в req добавить поля для внутр. пользования: { user, pagination, values, search }... можно с префиксом api или $
 - res.beforeSendCallback
+- объединить error import + message in index.js
+
+Ближайшее:
+1. проверить user, project и label в postman
+2. допилить контроллеры board и team со связями
+3. доделать boardElemController с проверкой связи с тимой
+4. доделать остальные борд элемы
+
 
 # Задачи бэк
 - запуск сервера и бд
@@ -63,8 +71,9 @@
 - get file: find file -> find task -> find list -> find board -> find team -> check if user in team members
 
 # Token
-- id
-- role
+- user id
 - project id
-- project sys name ?
 - board id
+
+- role ?
+- project sys name ?

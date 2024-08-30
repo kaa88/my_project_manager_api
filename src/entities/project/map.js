@@ -1,12 +1,13 @@
-import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
 import {
   BasicDeleteDTO,
   BasicGetDTO,
   BasicUpdateDTO,
-} from "../../shared/mappers/basicDTO.js";
-import { BasicEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumberArrayOrNull, toNumberOrNull } from "../../shared/utils.js";
+} from "../../shared/entities/basic/dto.js";
+import { BasicEntity } from "../../shared/entities/basic/entity.js";
+import {
+  toNumberArrayOrNull,
+  toNumberOrNull,
+} from "../../shared/utils/utils.js";
 
 export class Entity extends BasicEntity {
   constructor(data = {}) {

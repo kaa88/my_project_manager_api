@@ -1,4 +1,4 @@
-import { toNumber } from "../utils.js";
+import { toNumber } from "../utils/utils.js";
 
 const DEFAULT_LIMIT = 50;
 

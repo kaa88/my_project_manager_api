@@ -1,4 +1,4 @@
-import { BasicRouter } from "../../shared/routers/basicRouter.js";
+import { BasicRouter } from "../../shared/entities/basic/router.js";
 import { controller } from "./controller.js";
 
 export default new BasicRouter({ controller });

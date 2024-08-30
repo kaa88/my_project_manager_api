@@ -1,6 +1,6 @@
 import { PaginationParams } from "../shared/mappers/pagination.js";
-import { isObject } from "../shared/utils.js";
-import { ApiError } from "./error/apiError.js";
+import { isObject } from "../shared/utils/utils.js";
+import { ApiError } from "./error/index.js";
 
 function queryParserMiddleware(req, res, next) {
   try {

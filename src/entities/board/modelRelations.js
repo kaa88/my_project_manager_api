@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { ProjectElemRelations } from "../../shared/models/projectElemModel.js";
+import { ProjectElemRelations } from "../../shared/entities/projectElem/model.js";
 
 import { boards } from "./model.js";
 import { teamsToBoards } from "../_JoinTables/teamsToBoards.js";

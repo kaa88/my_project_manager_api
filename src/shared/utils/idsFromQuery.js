@@ -1,6 +1,5 @@
-import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
-import { isArray, isObject } from "../utils.js";
+import { ApiError, Message } from "../../services/error/index.js";
+import { isArray, isObject } from "./utils.js";
 
 export const getIdsFromQuery = (ids, query) => {
   if (!isArray(ids)) throw ApiError.internal(Message.incorrect("ids", "array"));
@@ -12,7 +11,7 @@ export const getIdsFromQuery = (ids, query) => {
 
   ids.forEach((key) => {
     if (typeof key !== "string")
-      throw ApiError.internal(Message.incorrect("ids key", "string"));
+      throw ApiError.internal(Message.incorrect("query id key", "string"));
 
     result[key] = Number(query[key]);
     if (!result[key]) errors.push(key);

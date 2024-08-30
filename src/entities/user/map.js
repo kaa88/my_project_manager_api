@@ -2,8 +2,8 @@ import {
   BasicDeleteDTO,
   BasicGetDTO,
   BasicUpdateDTO,
-} from "../../shared/mappers/basicDTO.js";
-import { BasicEntity } from "../../shared/mappers/basicEntity.js";
+} from "../../shared/entities/basic/dto.js";
+import { BasicEntity } from "../../shared/entities/basic/entity.js";
 
 export class Entity extends BasicEntity {
   constructor(data = {}) {

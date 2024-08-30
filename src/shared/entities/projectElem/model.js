@@ -1,6 +1,6 @@
 import { integer, serial } from "drizzle-orm/pg-core";
-import { projects } from "../../entities/project/model.js";
-import { BasicModel } from "./basicModel.js";
+import { projects } from "../../../entities/project/model.js";
+import { BasicModel } from "../basic/model.js";
 
 export class ProjectElemModel extends BasicModel {
   constructor() {

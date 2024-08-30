@@ -1,4 +1,4 @@
-import { ApiError } from "../error/apiError.js";
+import { ApiError } from "../error/index.js";
 
 function userRoleMiddleware(req, res, next) {
   const PID = 2;

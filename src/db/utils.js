@@ -1,5 +1,5 @@
-import { ApiError } from "../services/error/apiError.js";
-import { isDate } from "../shared/utils.js";
+import { ApiError } from "../services/error/index.js";
+import { isDate } from "../shared/utils/utils.js";
 
 export const getModelName = (model, instance) => {
   const error = ApiError.internal("Could not find model name");

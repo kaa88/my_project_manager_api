@@ -2,9 +2,9 @@ import {
   ProjectElemDeleteDTO,
   ProjectElemGetDTO,
   ProjectElemUpdateDTO,
-} from "../../shared/mappers/projectElemDTO.js";
-import { ProjectElemEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumberOrNull } from "../../shared/utils.js";
+} from "../../shared/entities/projectElem/dto.js";
+import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
+import { toNumberOrNull } from "../../shared/utils/utils.js";
 
 export class Entity extends ProjectElemEntity {
   constructor(data = {}) {

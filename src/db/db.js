@@ -6,7 +6,7 @@ import {
   getDbWithProps,
 } from "./queryProps.js";
 import { getModelName } from "./utils.js";
-import { getSerialId } from "../shared/utils.js";
+import { getSerialId } from "../shared/utils/utils.js";
 
 export const db = {
   async create({ model, values }) {

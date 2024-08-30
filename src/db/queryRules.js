@@ -1,7 +1,7 @@
 import { arrayContains, between, eq, ilike, isNull, or } from "drizzle-orm";
 import { checkDbQueryProps } from "./queryProps.js";
 import { getDateRange } from "./utils.js";
-import { isArray } from "../shared/utils.js";
+import { isArray } from "../shared/utils/utils.js";
 
 const EXCLUDED_PROPS = ["limit", "offset", "order", "orderBy"];
 

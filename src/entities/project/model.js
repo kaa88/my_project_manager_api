@@ -1,5 +1,5 @@
 import { pgTable, text, integer } from "drizzle-orm/pg-core";
-import { BasicModel } from "../../shared/models/basicModel.js";
+import { BasicModel } from "../../shared/entities/basic/model.js";
 
 export const projects = pgTable("projects", {
   ...new BasicModel(),

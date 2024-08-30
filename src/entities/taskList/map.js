@@ -2,9 +2,9 @@ import {
   BoardElemDeleteDTO,
   BoardElemGetDTO,
   BoardElemUpdateDTO,
-} from "../../shared/mappers/boardElemDTO.js";
-import { BoardElemEntity } from "../../shared/mappers/basicEntity.js";
-import { toNumberOrNull } from "../../shared/utils.js";
+} from "../../shared/entities/boardElem/dto.js";
+import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
+import { toNumberOrNull } from "../../shared/utils/utils.js";
 
 export class Entity extends BoardElemEntity {
   constructor(data = {}) {

@@ -1,4 +1,4 @@
-import { toNumber, toNumberArray } from "../utils.js";
+import { toNumber, toNumberArray } from "../utils/utils.js";
 
 export class BasicSearchParams {
   constructor(data = {}) {

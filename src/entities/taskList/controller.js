@@ -1,4 +1,4 @@
-import { BoardElemController } from "../../shared/controllers/boardElemController.js";
+import { BoardElemController } from "../../shared/entities/boardElem/controller.js";
 import { taskLists } from "./model.js";
 import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 

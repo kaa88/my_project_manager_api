@@ -1,11 +1,10 @@
-import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
+import { ApiError, Message } from "../../services/error/index.js";
 import {
   BoardElemDeleteDTO,
   BoardElemGetDTO,
   BoardElemUpdateDTO,
-} from "../../shared/mappers/boardElemDTO.js";
-import { BoardElemEntity } from "../../shared/mappers/basicEntity.js";
+} from "../../shared/entities/boardElem/dto.js";
+import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
 import {
   getShortDateString,
   isArray,
@@ -13,7 +12,7 @@ import {
   toNumber,
   toNumberArrayOrNull,
   toNumberOrNull,
-} from "../../shared/utils.js";
+} from "../../shared/utils/utils.js";
 
 export class Task extends BoardElemEntity {
   constructor(data = {}) {

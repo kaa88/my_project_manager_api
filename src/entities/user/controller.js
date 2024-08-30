@@ -1,4 +1,4 @@
-import { BasicController } from "../../shared/controllers/basicController.js";
+import { BasicController } from "../../shared/entities/basic/controller.js";
 import { users } from "./model.js";
 import { CreateDTO, DeleteDTO, Entity, GetDTO, UpdateDTO } from "./map.js";
 

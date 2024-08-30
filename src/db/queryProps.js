@@ -1,7 +1,6 @@
 import { or, and, asc, desc } from "drizzle-orm";
-import { isArray, isObject, isObjectEmpty } from "../shared/utils.js";
-import { ApiError } from "../services/error/apiError.js";
-import { Message } from "../services/error/message.js";
+import { ApiError, Message } from "../services/error/index.js";
+import { isArray, isObject, isObjectEmpty } from "../shared/utils/utils.js";
 import { getRulesFromQuery } from "./queryRules.js";
 
 const propCheck = {

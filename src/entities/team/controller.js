@@ -1,4 +1,4 @@
-import { ProjectElemController } from "../../shared/controllers/projectElemController.js";
+import { ProjectElemController } from "../../shared/entities/projectElem/controller.js";
 import { teams } from "./model.js";
 import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 

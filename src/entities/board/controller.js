@@ -1,10 +1,8 @@
-import { ApiError } from "../../services/error/apiError.js";
-import { Message } from "../../services/error/message.js";
+import { ApiError, Message } from "../../services/error/index.js";
 import { db } from "../../db/db.js";
-import { ProjectElemController } from "../../shared/controllers/projectElemController.js";
-import { projects } from "../project/model.js";
-import { boards } from "./model.js";
+import { ProjectElemController } from "../../shared/entities/projectElem/controller.js";
 import { controller as taskListController } from "../taskList/controller.js";
+import { boards } from "./model.js";
 import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 
 /* Role rights
@@ -24,120 +22,85 @@ export const controller = new ProjectElemController({
   },
 });
 
-controller.create = new CreateHandler(boards, Entity, CreateDTO);
+const handlers = {
+  create: new CreateHandler(boards, controller.handlers.create),
 
-controller.update = new UpdateHandler(boards, controller.update);
-controller.delete = new UpdateHandler(boards, controller.delete); // same handler
+  update: new UpdateHandler(boards, controller.handlers.update),
+  delete: new UpdateHandler(boards, controller.handlers.delete), // same handler
 
-controller.findOne = new FindOneHandler(boards, controller.findOne);
-controller.findMany = new FindOneHandler(boards, controller.findMany); // same handler
+  findOne: new FindOneHandler(boards, controller.handlers.findOne),
+  findMany: new FindOneHandler(boards, controller.handlers.findMany), // same handler
+};
 
-function CreateHandler(model, Entity, CreateDTO) {
+Object.assign(
+  controller,
+  handlers,
+  controller.createControllsFromHandlers(handlers)
+);
+
+function CreateHandler(model, protoHandler) {
   const AUTO_CREATE_LIST = false;
 
-  return async (req, res, next) => {
-    try {
-      // Access check
-      const accessError = ApiError.forbidden(Message.forbidden());
+  return async (req) => {
+    const userId =
+      req.user.userId !== undefined ? req.user.userId : req.query.userId;
+    req.body.creatorId = userId;
 
-      const userId =
-        req.user?.userId !== undefined ? req.user.userId : req.query.userId;
-      if (!userId) throw accessError;
+    const protoDTO = await protoHandler(req);
 
-      if (req.user?.projectId !== undefined)
-        req.body.projectId = req.user.projectId;
-      // перенести в basic board
+    req.body.projectId = protoDTO.projectId;
+    req.body.boardId = protoDTO.id;
+    if (req.user) req.user.boardId = protoDTO.id;
 
-      const project = await db.findOne({
-        model: projects,
-        query: { id: req.body.projectId },
-      });
-      if (!project || project.deletedAt)
-        throw ApiError.badRequest(
-          `Project with id=${req.body.projectId} does not exist`
-        );
-
-      if (
-        userId !== project.ownerId &&
-        (!isArray(project.adminIds) || !project.adminIds.includes(userId))
-      )
-        throw accessError;
-      // /Access check
-
-      req.body.creatorId = userId;
-      req.body.id = await db.generateId({
-        model,
-        query: { projectId: req.body.projectId },
-      });
-
-      const values = new Entity(req.body);
-
-      const response = await db.create({ model, values });
-      if (!response) throw ApiError.internal("Database error");
-
-      req.body.boardId = response.id;
-      if (req.user) req.user.boardId = response.id;
-
-      // сделать res.beforeSendCallback, чтобы не переписывать всю функцию
-      res.beforeSendCallback = async (req, res, next) => {
-        if (AUTO_CREATE_LIST) {
-          req.body.title = "Open";
-          await taskListController.create(req, res, next);
-          // дальше не сработает, т.к. пойдет ответ на фронт =(
-          // надо экспортировать отдельно хендлер
-          req.body.title = "In Progress";
-          await taskListController.create(req, res, next);
-          req.body.title = "Closed";
-          await taskListController.create(req, res, next);
-        }
-      };
-
-      return res.json(new CreateDTO(response));
-    } catch (e) {
-      return next(e.isApiError ? e : ApiError.internal(e.message));
+    if (AUTO_CREATE_LIST && taskListController?.handlers?.create) {
+      req.body.title = "Open";
+      await taskListController.handlers.create(req);
+      req.body.title = "In Progress";
+      await taskListController.handlers.create(req);
+      req.body.title = "Closed";
+      await taskListController.handlers.create(req);
     }
+
+    return protoDTO;
   };
 }
 
 function UpdateHandler(model, protoHandler) {
-  return async (req, res, next) => {
-    try {
-      // Access check
-      const accessError = ApiError.forbidden(Message.forbidden());
+  return async (req) => {
+    // перенести в basic
+    // Access check
+    const accessError = ApiError.forbidden(Message.forbidden());
 
-      const userId =
-        req.user?.userId !== undefined ? req.user.userId : req.query.ownerId;
-      if (!userId) throw accessError;
+    const userId =
+      req.user.userId !== undefined ? req.user.userId : req.query.ownerId;
+    if (!userId) throw accessError;
 
-      const { id } = getIdsFromQuery(["id"], req.params);
-      const project = await db.findOne({ model, query: { id } });
-      if (!project) throw ApiError.notFound(Message.notFound(query));
+    const { id } = getIdsFromQuery(["id"], req.params);
+    const project = await db.findOne({ model, query: { id } });
+    if (!project) throw ApiError.notFound(Message.notFound(query));
 
-      if (
-        userId !== project.ownerId &&
-        (!isArray(project.adminIds) || !project.adminIds.includes(userId))
-      )
-        throw accessError;
-      // /Access check
+    if (
+      userId !== project.ownerId &&
+      (!isArray(project.adminIds) || !project.adminIds.includes(userId))
+    )
+      throw accessError;
+    // /Access check
 
-      return await protoHandler(req, res, next);
-    } catch (e) {
-      return next(e.isApiError ? e : ApiError.internal(e.message));
-    }
+    return await protoHandler(req);
   };
 }
 
 function FindOneHandler(model, protoHandler) {
-  return async (req, res, next) => {
-    try {
-      // Access check
-      // req.query.memberIds =
-      //   req.user?.userId !== undefined ? req.user.userId : req.query.memberIds;
-      // /Access check
+  return async (req) => {
+    // try {
+    // Access check
+    // req.query.memberIds =
+    //   req.user.userId !== undefined ? req.user.userId : req.query.memberIds;
+    // /Access check
 
-      return await protoHandler(req, res, next);
-    } catch (e) {
-      return next(e.isApiError ? e : ApiError.internal(e.message));
-    }
+    return await protoHandler(req);
+    // } catch (e) {
+    //   return next(e.isApiError ? e : ApiError.internal(e.message));
+    // }
   };
 }

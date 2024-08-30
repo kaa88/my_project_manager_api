@@ -3,7 +3,7 @@ import { pgTable, text, integer } from "drizzle-orm/pg-core";
 import {
   ProjectElemModel,
   ProjectElemRelations,
-} from "../../shared/models/projectElemModel.js";
+} from "../../shared/entities/projectElem/model.js";
 
 import { teamsToBoards } from "../_JoinTables/teamsToBoards.js";
 

@@ -1,6 +1,9 @@
 import { integer } from "drizzle-orm/pg-core";
-import { boards } from "../../entities/board/model.js";
-import { ProjectElemModel, ProjectElemRelations } from "./projectElemModel.js";
+import { boards } from "../../../entities/board/model.js";
+import {
+  ProjectElemModel,
+  ProjectElemRelations,
+} from "../projectElem/model.js";
 
 export class BoardElemModel extends ProjectElemModel {
   constructor() {

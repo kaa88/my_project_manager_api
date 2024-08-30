@@ -1,4 +1,4 @@
-import { isArray, isObject, shortenText } from "../../shared/utils.js";
+import { isArray, isObject, shortenText } from "../../shared/utils/utils.js";
 
 export class Message {
   static required(fields) {
@@ -38,6 +38,6 @@ export class Message {
   }
 
   static forbidden() {
-    return "You cannot perform this operation because you do not have the correct role or you are not the owner";
+    return "You cannot perform this operation because you do not have the correct access rights";
   }
 }

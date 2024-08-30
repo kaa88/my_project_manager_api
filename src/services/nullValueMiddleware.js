@@ -1,4 +1,4 @@
-import { isObject } from "../shared/utils.js";
+import { isObject } from "../shared/utils/utils.js";
 import { ApiError } from "./error/apiError.js";
 
 function nullValueMiddleware(req, res, next) {

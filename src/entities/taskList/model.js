@@ -3,7 +3,7 @@ import { relations } from "drizzle-orm";
 import {
   BoardElemModel,
   BoardElemRelations,
-} from "../../shared/models/boardElemModel.js";
+} from "../../shared/entities/boardElem/model.js";
 
 import { tasks } from "../task/model.js";
 
