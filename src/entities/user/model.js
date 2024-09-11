@@ -12,7 +12,7 @@ export const users = pgTable("users", {
 
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull(), // array? | enum? ... delete
+  // role: text("role").notNull(), // array? | enum? ... delete
   accessToken: text("accessToken"),
   refreshToken: text("refreshToken"),
   lastVisitAt: timestamp("lastVisitAt").notNull().defaultNow(),

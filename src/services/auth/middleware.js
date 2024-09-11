@@ -17,17 +17,15 @@ function authMiddleware(req, res, next) {
       if (tokenData instanceof Error)
         throw ApiError.unauthorized("Invalid access token"); //?
 
-      req.user = {
-        id: Number(tokenData.user_id),
-        // projectId: tokenData.project_id,
-        // boardId: tokenData.board_id,
-      };
+      req.user.id = Number(tokenData.user_id);
+      // projectId: tokenData.project_id,
+      // boardId: tokenData.board_id,
+      // };
     } else {
-      req.user = {
-        id: Number(req.query.userId), // || 2, //
-        // projectId: req.body.projectId || req.query.projectId,
-        // boardId: req.body.boardId || req.query.boardId,
-      };
+      req.user.id = Number(req.query.userId); // || 2, //
+      // projectId: req.body.projectId || req.query.projectId,
+      // boardId: req.body.boardId || req.query.boardId,
+      // };
     }
 
     if (!req.user.id) throw ApiError.unauthorized("User ID was not provided");

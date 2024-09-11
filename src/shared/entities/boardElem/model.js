@@ -8,7 +8,7 @@ import {
 export class BoardElemModel extends ProjectElemModel {
   constructor() {
     super();
-    this.projectId = integer("projectId").notNull();
+    // this.projectId = integer("projectId").notNull();
     this.boardId = integer("boardId")
       .notNull()
       .references(() => boards.id);
@@ -18,7 +18,7 @@ export class BoardElemRelations extends ProjectElemRelations {
   constructor(model, relHandlers) {
     super(model, relHandlers);
     this.board = relHandlers.one(boards, {
-      fields: [model.projectId],
+      fields: [model.boardId],
       references: [boards.id],
     });
   }

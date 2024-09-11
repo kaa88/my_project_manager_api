@@ -12,15 +12,6 @@ export const getCurrentProject = async (projectId) => {
   return project;
 };
 
-export const checkWriteAccess = (req) => {
-  if (
-    req.user.id !== req.project.ownerId &&
-    (!isArray(req.project.adminIds) ||
-      !req.project.adminIds.includes(req.user.id))
-  )
-    throw ApiError.forbidden(Message.forbidden());
-};
-
 export const checkReadAccess = (req, errorCallback) => {
   if (
     !isArray(req.project.memberIds) ||
@@ -29,4 +20,13 @@ export const checkReadAccess = (req, errorCallback) => {
     if (errorCallback) errorCallback(req);
     else throw ApiError.forbidden(Message.forbidden());
   }
+};
+
+export const checkWriteAccess = (req) => {
+  if (
+    req.user.id !== req.project.ownerId &&
+    (!isArray(req.project.adminIds) ||
+      !req.project.adminIds.includes(req.user.id))
+  )
+    throw ApiError.forbidden(Message.forbidden());
 };

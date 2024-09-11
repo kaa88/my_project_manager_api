@@ -18,9 +18,9 @@ export class BoardElemHandlers extends BasicHandlers {
 }
 
 /* Role rights
-create - team members
-update - team members
-get - team members
+create - team / project members
+update - team / project members
+get - team / project members
 */
 
 function CreateHandler(model, protoHandler) {

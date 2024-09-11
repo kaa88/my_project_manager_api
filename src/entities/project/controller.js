@@ -23,13 +23,13 @@ export const controller = new BasicController({
 });
 
 controller.handlers = {
-  create: new CreateHandler(projects, controller.handlers.create),
+  create: new CreateHandler(controller.handlers.create),
 
-  update: new UpdateHandler(projects, controller.handlers.update),
-  delete: new UpdateHandler(projects, controller.handlers.delete), // same handler
+  update: new UpdateHandler(controller.handlers.update),
+  delete: new UpdateHandler(controller.handlers.delete), // same handler
 
-  findOne: new FindOneHandler(projects, controller.handlers.findOne),
-  findMany: new FindManyHandler(projects, controller.handlers.findMany),
+  findOne: new FindOneHandler(controller.handlers.findOne),
+  findMany: new FindManyHandler(controller.handlers.findMany),
 };
 controller.createControllsFromHandlers();
 
@@ -39,9 +39,10 @@ update - admin, project owner
 get - members
 */
 
-function CreateHandler(model, protoHandler) {
+function CreateHandler(protoHandler) {
   const AUTO_CREATE_BOARD = false;
   const AUTO_CREATE_LABEL = false;
+  // create team ?
 
   return async (req) => {
     req.body.ownerId = req.user.id || req.query.userId || req.body.ownerId;
@@ -50,7 +51,6 @@ function CreateHandler(model, protoHandler) {
     const protoDTO = await protoHandler(req);
 
     req.body.projectId = protoDTO.id;
-    // add cookie update
 
     if (AUTO_CREATE_BOARD && boardController?.handlers?.create) {
       req.body.title = "Board";
@@ -66,7 +66,7 @@ function CreateHandler(model, protoHandler) {
   };
 }
 
-function UpdateHandler(model, protoHandler) {
+function UpdateHandler(protoHandler) {
   return async (req) => {
     const { id } = getIdsFromQuery(["id"], req.params);
     req.project = await getCurrentProject(id);
@@ -76,7 +76,7 @@ function UpdateHandler(model, protoHandler) {
   };
 }
 
-function FindOneHandler(model, protoHandler) {
+function FindOneHandler(protoHandler) {
   return async (req) => {
     const protoDTO = await protoHandler(req);
     req.project = protoDTO;
@@ -86,11 +86,11 @@ function FindOneHandler(model, protoHandler) {
   };
 }
 
-function FindManyHandler(model, protoHandler) {
+function FindManyHandler(protoHandler) {
   return async (req) => {
     req.query.memberIds = req.user.id;
     return await protoHandler(req);
   };
 }
 
-function SetCurrentProject(model, protoHandler) {} // или это в юзера?
+function SetCurrentProject(protoHandler) {} // или это в юзера?
