@@ -8,6 +8,6 @@ export * from "../entities/label/model.js";
 export * from "../entities/project/model.js";
 export * from "../entities/project/modelRelations.js";
 export * from "../entities/task/model.js";
-export * from "../entities/taskList/model.js";
+// export * from "../entities/taskList/model.js";
 export * from "../entities/team/model.js";
 export * from "../entities/user/model.js";

@@ -1,13 +1,13 @@
 import { ApiError, Message } from "../../services/error/index.js";
 import { db } from "../../db/db.js";
 import { ProjectElemController } from "../../shared/entities/projectElem/controller.js";
-import { controller as taskListController } from "../taskList/controller.js";
+// import { controller as taskListController } from "../taskList/controller.js";
 import { boards } from "./model.js";
-import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
+import { Board, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
 
 export const controller = new ProjectElemController({
   model: boards,
-  entity: Entity,
+  entity: Board,
   dto: {
     get: GetDTO,
     create: CreateDTO,
@@ -26,23 +26,26 @@ get - admin, private boards - members of accessable teams, public boards - proje
 */
 
 function CreateHandler(protoHandler) {
-  const AUTO_CREATE_LIST = false;
+  const AUTO_CREATE_LIST = true;
 
   return async (req) => {
-    const protoDTO = await protoHandler(req);
-
-    req.body.projectId = protoDTO.projectId;
-    req.body.boardId = protoDTO.id;
-
-    if (AUTO_CREATE_LIST && taskListController?.handlers?.create) {
-      req.body.title = "Open";
-      await taskListController.handlers.create(req);
-      req.body.title = "In Progress";
-      await taskListController.handlers.create(req);
-      req.body.title = "Closed";
-      await taskListController.handlers.create(req);
+    if (AUTO_CREATE_LIST) {
+      req.body.taskLists = [
+        {
+          id: 1,
+          title: "Open",
+        },
+        {
+          id: 2,
+          title: "In Progress",
+        },
+        {
+          id: 3,
+          title: "Closed",
+        },
+      ];
     }
 
-    return protoDTO;
+    return await protoHandler(req);
   };
 }

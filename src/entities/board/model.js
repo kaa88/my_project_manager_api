@@ -1,4 +1,4 @@
-import { pgTable, text, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, json } from "drizzle-orm/pg-core";
 import { ProjectElemModel } from "../../shared/entities/projectElem/model.js";
 
 export const boards = pgTable("boards", {
@@ -7,6 +7,6 @@ export const boards = pgTable("boards", {
   title: text("title").notNull(),
   description: text("description"),
   image: text("image"),
-  listOrder: integer("listOrder").array(),
+  taskLists: json("taskLists"),
   creatorId: integer("creatorId").notNull(),
 });
