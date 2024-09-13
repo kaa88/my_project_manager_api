@@ -5,11 +5,11 @@ import { isArray, isObjectEmpty } from "../../utils/utils.js";
 import nullValueMiddleware from "../../../services/nullValueMiddleware.js";
 import queryParserMiddleware from "../../../services/queryParserMiddleware.js";
 import authMiddleware from "../../../services/auth/middleware.js";
-import userRoleMiddleware from "../../../services/userRoles/middleware.js";
+// import userRoleMiddleware from "../../../services/userRoles/middleware.js";
 
 const middlewares = [
   authMiddleware,
-  userRoleMiddleware,
+  // userRoleMiddleware,
   nullValueMiddleware,
   queryParserMiddleware,
 ];
