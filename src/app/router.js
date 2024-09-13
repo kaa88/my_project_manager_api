@@ -9,6 +9,7 @@ import taskRouter from "../entities/task/router.js";
 // import taskListRouter from "../entities/taskList/router.js";
 import teamRouter from "../entities/team/router.js";
 import userRouter from "../entities/user/router.js";
+import authCheckRouter from "../services/auth/authCheck.js";
 
 const mainRouter = express.Router();
 
@@ -21,5 +22,7 @@ mainRouter.use("/task", taskRouter);
 // mainRouter.use("/tasklist", taskListRouter);
 mainRouter.use("/team", teamRouter);
 mainRouter.use("/user", userRouter);
+
+mainRouter.use("/authcheck", authCheckRouter);
 
 export default mainRouter;

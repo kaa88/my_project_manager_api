@@ -10,7 +10,7 @@ import { BasicModel } from "../../shared/entities/basic/model.js";
 export const users = pgTable("users", {
   ...new BasicModel(),
 
-  email: text("email").notNull().unique(),
+  email: text("email").notNull(), // .unique(), not unique because of 'deletedAt' prop
   password: text("password").notNull(),
   // role: text("role").notNull(), // array? | enum? ... delete
   accessToken: text("accessToken"),

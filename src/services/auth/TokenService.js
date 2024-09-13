@@ -1,21 +1,35 @@
 import jwt from "jsonwebtoken";
+import { ApiError } from "../error/index.js";
 import { isObjectEmpty } from "../../shared/utils/utils.js";
-import { ApiError } from "../error/apiError.js";
+import { parsePeriod } from "./utils.js";
 
 const ACCESS_TOKEN_EXPIRE_PERIOD = "10m";
 const REFRESH_TOKEN_EXPIRE_PERIOD = "14d";
 
-const TokenService = {
-  generateToken(data = {}) {
-    if (isObjectEmpty(data))
-      throw ApiError.internal('Failed to generate token, "data" is empty.');
-    const accessToken = jwt.sign(data, process.env.ACCESS_SECRET_KEY, {
+const GENERATION_ERROR = ApiError.internal(
+  'Failed to generate token, "data" is empty.'
+);
+
+export const TokenService = {
+  generateTokens(data = {}) {
+    return {
+      accessToken: generateAccessToken(data),
+      refreshToken: generateRefreshToken(data),
+    };
+  },
+  generateAccessToken(data = {}) {
+    if (isObjectEmpty(data)) throw GENERATION_ERROR;
+    const token = jwt.sign(data, process.env.ACCESS_SECRET_KEY, {
       expiresIn: ACCESS_TOKEN_EXPIRE_PERIOD,
     });
-    const refreshToken = jwt.sign(data, process.env.REFRESH_SECRET_KEY, {
+    return `Bearer ${token}`;
+  },
+  generateRefreshToken(data = {}) {
+    if (isObjectEmpty(data)) throw GENERATION_ERROR;
+    const token = jwt.sign(data, process.env.REFRESH_SECRET_KEY, {
       expiresIn: REFRESH_TOKEN_EXPIRE_PERIOD,
     });
-    return { accessToken, refreshToken };
+    return `Bearer ${token}`;
   },
   validateAccessToken(token) {
     return validateToken(token, process.env.ACCESS_SECRET_KEY);
@@ -23,17 +37,42 @@ const TokenService = {
   validateRefreshToken(token) {
     return validateToken(token, process.env.REFRESH_SECRET_KEY);
   },
+
+  getAccessCookie(token = "null") {
+    return [
+      "access_token",
+      token,
+      {
+        maxAge: parsePeriod(ACCESS_TOKEN_EXPIRE_PERIOD),
+        httpOnly: true,
+        secure: true,
+      },
+    ];
+  },
+  getRefreshCookie(token = "null") {
+    return [
+      "refresh_token",
+      token,
+      {
+        maxAge: parsePeriod(REFRESH_TOKEN_EXPIRE_PERIOD),
+        httpOnly: true,
+        secure: true,
+      },
+    ];
+  },
 };
-export default TokenService;
 
 function validateToken(token, key) {
-  // ??????????????????????????????
   try {
-    if (!token || !key)
-      throw ApiError.internal("Validation failed. Missing token or key.");
-    const tokenUserData = jwt.verify(token, key);
-    return tokenUserData;
+    const cleanToken = token.split(" ")[1]; // trim Bearer
+    if (!cleanToken || !key)
+      throw ApiError.badRequest(
+        "Validation failed: missing token or secret key."
+      );
+
+    const tokenData = jwt.verify(cleanToken, key);
+    return tokenData;
   } catch (e) {
-    return e.isApiError ? e : ApiError.internal(e.message);
+    return e.isApiError ? e : ApiError.unauthorized("Invalid token");
   }
 }

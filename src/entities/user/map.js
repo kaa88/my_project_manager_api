@@ -10,7 +10,7 @@ export class Entity extends BasicEntity {
     super(data);
     if (data.email !== undefined) this.email = data.email;
     if (data.password !== undefined) this.password = data.password;
-    if (data.role !== undefined) this.role = data.role;
+    // if (data.role !== undefined) this.role = data.role;
     if (data.isEmailVerified !== undefined)
       this.isEmailVerified = data.isEmailVerified;
     if (data.isCookieAccepted !== undefined)
@@ -24,9 +24,9 @@ export class Entity extends BasicEntity {
 export class GetDTO extends BasicGetDTO {
   constructor(entity, isShortResult) {
     super(entity, isShortResult);
+    this.email = entity.email;
     if (!isShortResult) {
-      this.email = entity.email;
-      this.role = entity.role;
+      // this.role = entity.role;
       this.isEmailVerified = entity.isEmailVerified;
       this.isCookieAccepted = entity.isCookieAccepted;
     }
