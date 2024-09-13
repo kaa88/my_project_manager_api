@@ -12,3 +12,15 @@ export const controller = new ProjectElemController({
     delete: DeleteDTO,
   },
 });
+
+controller.handlers.create = new CreateHandler(controller.handlers.create);
+controller.createControllsFromHandlers();
+
+function CreateHandler(protoHandler) {
+  return async (req) => {
+    req.body.leaderId = req.body.leaderId || req.user.id;
+    req.body.memberIds = req.body.memberIds || req.user.id;
+
+    return await protoHandler(req);
+  };
+}
