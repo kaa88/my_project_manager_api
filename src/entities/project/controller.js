@@ -10,6 +10,7 @@ import {
   checkReadAccess,
   checkWriteAccess,
 } from "../../shared/entities/projectElem/utils.js";
+import { toNumberArrayOrNull } from "../../shared/utils/utils.js";
 
 export const controller = new BasicController({
   model: projects,
@@ -46,7 +47,19 @@ function CreateHandler(protoHandler) {
 
   return async (req) => {
     req.body.ownerId = req.user.id || req.query.userId || req.body.ownerId;
-    req.body.memberIds = req.body.ownerId;
+
+    if (req.body.memberIds !== undefined)
+      req.body.memberIds = toNumberArrayOrNull(req.body.memberIds);
+    req.body.memberIds = [
+      ...new Set([req.body.ownerId, ...(req.body.memberIds || [])]),
+    ];
+
+    if (req.body.adminIds !== undefined) {
+      req.body.adminIds = toNumberArrayOrNull(req.body.adminIds);
+      req.body.memberIds = [
+        ...new Set([...req.body.memberIds, ...(req.body.adminIds || [])]),
+      ];
+    }
 
     const protoDTO = await protoHandler(req);
 
@@ -72,6 +85,27 @@ function UpdateHandler(protoHandler) {
     req.project = await getCurrentProject(id);
     checkWriteAccess(req);
 
+    const newOwner =
+      req.body.ownerId === undefined
+        ? []
+        : toNumberArrayOrNull(req.body.ownerId) || [];
+
+    const newAdmins =
+      req.body.adminIds === undefined
+        ? []
+        : toNumberArrayOrNull(req.body.adminIds) || [];
+
+    let newMembers =
+      req.body.memberIds === undefined
+        ? []
+        : toNumberArrayOrNull(req.body.memberIds) || [];
+
+    if (!newMembers.length && (!!newOwner.length || !!newAdmins.length))
+      newMembers = req.project.memberIds || [];
+
+    const arrayOfNew = [...newOwner, ...newAdmins, ...newMembers];
+    if (arrayOfNew.length) req.body.memberIds = [...new Set(arrayOfNew)];
+
     return await protoHandler(req);
   };
 }
@@ -93,4 +127,4 @@ function FindManyHandler(protoHandler) {
   };
 }
 
-function SetCurrentProject(protoHandler) {} // или это в юзера?
+// function SetCurrentProject(protoHandler) {} // или это в юзера?
