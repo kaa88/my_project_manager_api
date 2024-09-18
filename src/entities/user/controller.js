@@ -50,11 +50,13 @@ get - same user
 get many - any
 */
 
+const ADD_TOKEN_TO_DTO = true;
+
 function CreateHandler(protoHandler) {
   return async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
-      throw ApiError.badRequest(`Validation failed: ${errors}`);
+      throw ApiError.badRequest(Message.validation(errors));
 
     const { email, password } = req.body;
 
@@ -77,24 +79,13 @@ function CreateHandler(protoHandler) {
       email,
     });
 
-    res.cookie(
-      ...TokenService.getAccessCookie(accessToken),
-      ...TokenService.getRefreshCookie(refreshToken)
-    );
+    res.cookie(...TokenService.getAccessCookie(accessToken));
+    res.cookie(...TokenService.getRefreshCookie(refreshToken));
+    if (ADD_TOKEN_TO_DTO) protoDTO.accessToken = accessToken;
 
     // send email
 
     return protoDTO;
-    // email: text("email").notNull().unique(),
-    // password: text("password").notNull(),
-    // accessToken: text("accessToken"),
-    // refreshToken: text("refreshToken"),
-    // lastVisitAt: timestamp("lastVisitAt").notNull().defaultNow(),
-    // isEmailVerified: boolean("isEmailVerified").default(false),
-    // isCookieAccepted: boolean("isCookieAccepted").default(false),
-    // firstName: text("firstName"),
-    // lastName: text("lastName"),
-    // image: text("image"),
   };
 }
 
@@ -129,7 +120,7 @@ function ChangePasswordHandler(protoHandler) {
   return async (req) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
-      throw ApiError.badRequest(`Validation failed: ${errors}`);
+      throw ApiError.badRequest(Message.validation(errors));
 
     const { id } = getIdsFromQuery(["id"], req.params);
     if (id !== req.user.id) throw ApiError.forbidden(Message.forbidden());
@@ -142,8 +133,8 @@ function ChangePasswordHandler(protoHandler) {
 
     const { oldPassword, newPassword } = req.body;
     const comparePassword = bcrypt.compareSync(
-      currentUser.password,
-      oldPassword
+      oldPassword || "",
+      currentUser.password
     );
     if (!comparePassword) throw ApiError.badRequest("Incorrect old password");
 
@@ -156,7 +147,7 @@ function ChangePasswordHandler(protoHandler) {
 function RestorePasswordHandler() {
   return async (req) => {
     const { email } = req.body;
-    if (!email) throw ApiError.badRequest("Email is required");
+    if (!email) throw ApiError.badRequest("Email required");
 
     const user = await db.findOne({ model, query: { email, deletedAt: null } });
     if (user) console.log(`sending email to ${email}`);
@@ -171,7 +162,7 @@ function RestorePasswordConfirmHandler(protoHandler) {
   return async (req) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
-      throw ApiError.badRequest(`Validation failed: ${errors}`);
+      throw ApiError.badRequest(Message.validation(errors));
 
     const { email, code, newPassword } = req.body; // ?
 
@@ -193,7 +184,7 @@ function LoginHandler() {
   return async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password)
-      throw ApiError.badRequest("Email and password are required");
+      throw ApiError.badRequest("Email and password required");
 
     const INCORRECT_CREDENTIALS_ERROR = ApiError.badRequest(
       "Incorrect email or password"
@@ -205,7 +196,10 @@ function LoginHandler() {
     });
     if (!candidate) throw INCORRECT_CREDENTIALS_ERROR;
 
-    const comparePassword = bcrypt.compareSync(candidate.password, password);
+    const comparePassword = bcrypt.compareSync(
+      password || "",
+      candidate.password
+    );
     if (!comparePassword) throw INCORRECT_CREDENTIALS_ERROR;
 
     const { accessToken, refreshToken } = TokenService.generateTokens({
@@ -213,22 +207,22 @@ function LoginHandler() {
       email,
     });
 
-    res.cookie(
-      ...TokenService.getAccessCookie(accessToken),
-      ...TokenService.getRefreshCookie(refreshToken)
-    );
+    res.cookie(...TokenService.getAccessCookie(accessToken));
+    res.cookie(...TokenService.getRefreshCookie(refreshToken));
 
     const response = await db.update({
       model,
       query: { email },
       values: { lastVisitAt: new Date() },
     });
-    return new GetDTO(response);
+    const dto = new GetDTO(response);
+    if (ADD_TOKEN_TO_DTO) dto.accessToken = accessToken;
+    return dto;
   };
 }
 
 function LogoutHandler() {
-  return async (req) => {
+  return async (req, res) => {
     res.clearCookie("access_token");
     res.clearCookie("refresh_token");
     return { message: "Successfully logged out" };
@@ -256,10 +250,8 @@ function RefreshHandler() {
       email,
     });
 
-    res.cookie(
-      ...TokenService.getAccessCookie(accessToken),
-      ...TokenService.getRefreshCookie(refreshToken)
-    );
+    res.cookie(...TokenService.getAccessCookie(accessToken));
+    res.cookie(...TokenService.getRefreshCookie(refreshToken));
 
     db.update({
       model,
@@ -267,7 +259,9 @@ function RefreshHandler() {
       values: { lastVisitAt: new Date() },
     });
 
-    return { message: "Token has been refreshed" };
+    const response = { message: "Token has been refreshed" };
+    if (ADD_TOKEN_TO_DTO) response.accessToken = accessToken;
+    return response;
   };
 }
 

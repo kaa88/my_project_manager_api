@@ -13,8 +13,8 @@ export const users = pgTable("users", {
   email: text("email").notNull(), // .unique(), not unique because of 'deletedAt' prop
   password: text("password").notNull(),
   // role: text("role").notNull(), // array? | enum? ... delete
-  accessToken: text("accessToken"),
-  refreshToken: text("refreshToken"),
+  accessToken: text("accessToken"), // не надо?
+  refreshToken: text("refreshToken"), // не надо?
   lastVisitAt: timestamp("lastVisitAt").notNull().defaultNow(),
   isEmailVerified: boolean("isEmailVerified").default(false),
   isCookieAccepted: boolean("isCookieAccepted").default(false),

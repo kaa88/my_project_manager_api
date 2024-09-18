@@ -20,7 +20,7 @@ export class BasicController {
     Object.keys(handlers).forEach((handler) => {
       this[handler] = async (req, res, next) => {
         try {
-          return res.json(await handlers[handler](req));
+          return res.json(await handlers[handler](req, res, next));
         } catch (e) {
           return next(e.isApiError ? e : ApiError.internal(e.message));
         }

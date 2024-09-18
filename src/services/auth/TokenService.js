@@ -13,8 +13,8 @@ const GENERATION_ERROR = ApiError.internal(
 export const TokenService = {
   generateTokens(data = {}) {
     return {
-      accessToken: generateAccessToken(data),
-      refreshToken: generateRefreshToken(data),
+      accessToken: this.generateAccessToken(data),
+      refreshToken: this.generateRefreshToken(data),
     };
   },
   generateAccessToken(data = {}) {

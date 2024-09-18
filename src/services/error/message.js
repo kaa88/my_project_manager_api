@@ -40,4 +40,14 @@ export class Message {
   static forbidden() {
     return "You cannot perform this operation because you do not have the correct access rights";
   }
+
+  static validation(expressValidatorResult) {
+    const textErrors = !isArray(expressValidatorResult.errors)
+      ? ["Unknown error"]
+      : expressValidatorResult.errors.map(
+          (err) => `${err.msg} (${err.path}): '${err.value}'`
+        );
+
+    return `Validation failed. ${textErrors.join("; ")}`;
+  }
 }

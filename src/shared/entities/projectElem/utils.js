@@ -1,6 +1,7 @@
 import { ApiError, Message } from "../../../services/error/index.js";
 import { db } from "../../../db/db.js";
 import { projects } from "../../../entities/project/model.js";
+import { isArray } from "../../utils/utils.js";
 
 export const getCurrentProject = async (projectId) => {
   const project = await db.findOne({

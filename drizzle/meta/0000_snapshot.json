@@ -1,5 +1,5 @@
 {
-  "id": "f037e6e2-7fdc-4cf2-9123-977be4ed0cc4",
+  "id": "a8cbd185-e81d-4b7b-a1a6-469bd814715f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -121,9 +121,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "listOrder": {
-          "name": "listOrder",
-          "type": "integer[]",
+        "taskLists": {
+          "name": "taskLists",
+          "type": "json",
           "primaryKey": false,
           "notNull": false
         },
@@ -243,6 +243,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "comments_projectId_projects_id_fk": {
+          "name": "comments_projectId_projects_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "comments_boardId_boards_id_fk": {
           "name": "comments_boardId_boards_id_fk",
           "tableFrom": "comments",
@@ -374,6 +387,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "files_projectId_projects_id_fk": {
+          "name": "files_projectId_projects_id_fk",
+          "tableFrom": "files",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "files_boardId_boards_id_fk": {
           "name": "files_boardId_boards_id_fk",
           "tableFrom": "files",
@@ -685,6 +711,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "tasks_projectId_projects_id_fk": {
+          "name": "tasks_projectId_projects_id_fk",
+          "tableFrom": "tasks",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "tasks_boardId_boards_id_fk": {
           "name": "tasks_boardId_boards_id_fk",
           "tableFrom": "tasks",
@@ -697,125 +736,12 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "tasks_taskListId_taskLists_id_fk": {
-          "name": "tasks_taskListId_taskLists_id_fk",
-          "tableFrom": "tasks",
-          "tableTo": "taskLists",
-          "columnsFrom": [
-            "taskListId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "tasks_id_unique": {
           "name": "tasks_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
-    },
-    "public.taskLists": {
-      "name": "taskLists",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "projectId": {
-          "name": "projectId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "boardId": {
-          "name": "boardId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "color": {
-          "name": "color",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "creatorId": {
-          "name": "creatorId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "taskLists_boardId_boards_id_fk": {
-          "name": "taskLists_boardId_boards_id_fk",
-          "tableFrom": "taskLists",
-          "tableTo": "boards",
-          "columnsFrom": [
-            "boardId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "taskLists_id_unique": {
-          "name": "taskLists_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
@@ -965,12 +891,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "accessToken": {
           "name": "accessToken",
           "type": "text",
@@ -1026,15 +946,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     }
   },
   "enums": {},
