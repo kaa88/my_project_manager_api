@@ -31,7 +31,7 @@ app.use(
   })
 );
 
-app.use(DOMAIN_BASENAME + "/api", router);
+app.use(DOMAIN_BASENAME + "/api/v1", router);
 
 app.use(routeErrorMiddleware);
 app.use(errorMiddleware);
