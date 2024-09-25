@@ -1,8 +1,8 @@
 import { ApiError } from "../services/error/index.js";
-import { isDate } from "../shared/utils/utils.js";
+import { isDate } from "../shared/utils/date.js";
 
 export const getModelName = (model, instance) => {
-  const error = ApiError.internal("Could not find model name");
+  const error = ApiError.internal("Cannot find model name");
 
   if (!model || !instance?.query) throw error;
 

@@ -1,57 +1,59 @@
 import { arrayContains, between, eq, ilike, isNull, or } from "drizzle-orm";
-import { checkDbQueryProps } from "./queryProps.js";
+import { checkDbQueryProps } from "./propsCheck.js";
 import { getDateRange } from "./utils.js";
 import { isArray } from "../shared/utils/utils.js";
 
 const EXCLUDED_PROPS = ["limit", "offset", "order", "orderBy"];
 
-export const getRulesFromQuery = ({ model, query }) => {
-  checkDbQueryProps({ model, query });
+// This func generates chunks with rules for DB query.
+export const getRulesFromQuery = ({ model, query }, propsChecked) => {
+  if (!propsChecked) checkDbQueryProps({ model, query });
 
   return Object.entries(query).map(([key, value]) => {
-    if (value === undefined || EXCLUDED_PROPS.includes(key)) return;
-
     const column = model[key];
-    const type = column.dataType;
+    if (!column) return;
+    const columnType = column.dataType;
+
+    if (value === undefined || EXCLUDED_PROPS.includes(key)) return;
 
     if (value === null) return isNull(column);
 
-    if (type === "string") return ilike(column, `%${value}%`);
+    if (columnType === "string") return ilike(column, `%${value}%`);
 
-    if (type === "number")
+    if (columnType === "number")
       return isArray(value)
         ? or(...value.map((v) => eq(column, v)))
         : eq(column, value);
 
-    if (type === "boolean") return eq(column, value);
+    if (columnType === "boolean") return eq(column, value);
 
-    if (type === "date") {
+    if (columnType === "date") {
       const [from, to] = getDateRange(value);
       return between(column, new Date(from), new Date(to));
     }
 
-    if (type === "json") return null;
+    if (columnType === "json") return null; // ?
 
-    if (type === "array") {
+    if (columnType === "array") {
       return arrayContains(column, value);
     }
   });
 };
 
-// export const getSearchRulesFromQuery = ({ model, query }) => {
-//   checkDbQueryProps({ model, query });
+// export const getSearchRulesFromQuery = ({ model, query }, propsChecked) => {
+//   if (!propsChecked) checkDbQueryProps({ model, query });
 
 //   return Object.entries(query).map(([key, value]) => {
 //     if (value === undefined || EXCLUDED_PROPS.includes(key)) return;
 
-//     const type = model[key].dataType;
-//     if (type === "string") return ilike(model[key], `%${value}%`);
+//     const columnType = model[key].dataType;
+//     if (columnType === "string") return ilike(model[key], `%${value}%`);
 //     // ...?
 //   });
 // };
 
 ////////////////////////////////////////////////////
-// test column data types
+// test column data columnTypes
 // import * as DRZL from "drizzle-orm/pg-core";
 // const _testtable = DRZL.pgTable("test_table", {
 //   integer: DRZL.integer("integer"),

@@ -1,9 +1,9 @@
 import instance from "./init.js";
+import { checkDbQueryProps } from "./propsCheck.js";
 import {
-  checkDbQueryProps,
   getDbPaginationProps,
   getDbWhereProps,
-  getDbWithProps,
+  getDbFieldSelectProps,
 } from "./queryProps.js";
 import { getModelName } from "./utils.js";
 import { getSerialId } from "../shared/utils/utils.js";
@@ -19,7 +19,7 @@ export const db = {
   async update({ model, query, values }) {
     checkDbQueryProps({ model, query, values });
 
-    const dbQuery = getDbWhereProps({ model, query });
+    const dbQuery = getDbWhereProps({ model, query }, true);
 
     const response = await instance
       .update(model)
@@ -32,38 +32,39 @@ export const db = {
   async delete({ model, query }) {
     checkDbQueryProps({ model, query });
 
-    const dbQuery = getDbWhereProps({ model, query });
+    const dbQuery = getDbWhereProps({ model, query }, true);
 
     const response = await instance
       .delete(model)
       .where(dbQuery.where)
-      .returning({ id: model.id });
+      .returning(model.id ? { id: model.id } : undefined);
     return response[0];
   },
 
-  async findOne({ model, query, related }) {
+  async findOne({ model, query }) {
     checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
     const dbQuery = {
-      ...getDbWhereProps({ model, query }),
-      ...getDbWithProps(related),
+      ...getDbWhereProps({ model, query }, true),
+      ...getDbFieldSelectProps({ model, query }, true),
     };
 
     return await instance.query[modelName].findFirst(dbQuery);
   },
 
-  async findMany({ model, query, related }) {
-    // checkDbQueryProps({ model, query });
-    const totalItems = await this.count({ model, query });
+  async findMany({ model, query, count = true }) {
+    checkDbQueryProps({ model, query });
     let response = [];
+    let totalItems = 0;
+    if (count) totalItems = await this.count({ model, query }, true);
 
-    if (totalItems) {
+    if ((count && totalItems) || !count) {
       const modelName = getModelName(model, instance);
       const dbQuery = {
-        ...getDbPaginationProps({ model, query }),
-        ...getDbWhereProps({ model, query }),
-        ...getDbWithProps(related),
+        ...getDbPaginationProps({ model, query }, true),
+        ...getDbWhereProps({ model, query }, true),
+        ...getDbFieldSelectProps({ model, query }, true),
       };
 
       response = await instance.query[modelName].findMany(dbQuery);
@@ -71,33 +72,33 @@ export const db = {
     return { items: response, total: totalItems };
   },
 
-  async count({ model, query }) {
-    checkDbQueryProps({ model, query });
+  async count({ model, query }, propsChecked) {
+    if (!propsChecked) checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
     const dbQuery = {
-      ...getDbWhereProps({ model, query }),
-      columns: { id: true },
+      ...getDbWhereProps({ model, query }, true),
       limit: 0,
       offset: 0,
     };
+    if (model.id) dbQuery.columns = { id: true };
 
     const response = await instance.query[modelName].findMany(dbQuery);
     return response.length;
   },
 
-  async generateId({ model, query }) {
-    checkDbQueryProps({ model, query });
+  async generateId({ model, query, idName = "id" }, propsChecked) {
+    if (!propsChecked) checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
     const dbQuery = {
-      ...getDbWhereProps({ model, query }),
-      columns: { id: true },
+      ...getDbWhereProps({ model, query }, true),
       limit: 0,
       offset: 0,
     };
+    if (model[idName]) dbQuery.columns = { [idName]: true };
 
     const response = await instance.query[modelName].findMany(dbQuery);
-    return getSerialId(response);
+    return getSerialId(response.map((item) => item.id));
   },
 };

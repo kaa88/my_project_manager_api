@@ -1,4 +1,4 @@
-export * from "../entities/_JoinTables/teamsToBoards.js";
+export * from "../entities/_relationTables/teamsToBoards/model.js";
 
 export * from "../entities/board/model.js";
 export * from "../entities/board/modelRelations.js";

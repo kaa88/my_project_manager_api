@@ -3,4 +3,8 @@ import { sql } from "@vercel/postgres";
 
 import * as schema from "./schema.js";
 
-export default drizzle(sql, { schema, logger: true });
+const instance = drizzle(sql, { schema, logger: true });
+
+// console.log(instance);
+
+export default instance;

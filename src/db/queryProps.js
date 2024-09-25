@@ -1,48 +1,29 @@
 import { or, and, asc, desc } from "drizzle-orm";
-import { ApiError, Message } from "../services/error/index.js";
-import { isArray, isObject, isObjectEmpty } from "../shared/utils/utils.js";
+import { isObject } from "../shared/utils/utils.js";
 import { getRulesFromQuery } from "./queryRules.js";
-
-const propCheck = {
-  model: (value) => isObject(value),
-  values: (value) => isObject(value),
-  query: (value) => isObject(value),
-  customChunks: (value) => isArray(value),
-};
-
-export const checkDbQueryProps = (props) => {
-  const required = [];
-  const incorrect = [];
-  for (let key in props) {
-    if (props[key] === undefined) required.push(key);
-    else if (propCheck[key] && !propCheck[key](props[key])) incorrect.push(key);
-  }
-  if (required.length) throw ApiError.internal(Message.required(required));
-  if (incorrect.length)
-    throw ApiError.internal(`Incorrect type of props: ${incorrect}`);
-};
+import { checkDbQueryProps } from "./propsCheck.js";
 
 const DEFAULT_ORDER_BY = "id";
 
-export const getDbPaginationProps = ({ model, query }) => {
-  checkDbQueryProps({ model, query });
+export const getDbPaginationProps = ({ model, query }, propsChecked) => {
+  if (!propsChecked) checkDbQueryProps({ model, query });
 
   const result = {};
 
-  if (query.limit) result.limit = query.limit;
-  if (query.offset) result.offset = query.offset;
+  if (query.limit !== undefined) result.limit = query.limit;
+  if (query.offset !== undefined) result.offset = query.offset;
 
   const order = /desc/i.test(query.order) ? desc : asc;
   const orderBy = query.orderBy || DEFAULT_ORDER_BY;
-  result.orderBy = [order(model[orderBy])];
+  if (model[orderBy]) result.orderBy = [order(model[orderBy])];
 
   return result;
 };
 
-export const getDbWhereProps = ({ model, query }) => {
-  // checkDbQueryProps({ model, query });
+export const getDbWhereProps = ({ model, query }, propsChecked) => {
+  if (!propsChecked) checkDbQueryProps({ model, query });
 
-  let chunks = getRulesFromQuery({ model, query });
+  let chunks = getRulesFromQuery({ model, query }, true);
   chunks = chunks.filter((c) => c);
 
   // const operator = query.search !== undefined ? or : and;
@@ -51,6 +32,11 @@ export const getDbWhereProps = ({ model, query }) => {
   return chunks.length ? { where: operator(...chunks) } : {};
 };
 
-export const getDbWithProps = (obj) => {
-  return isObjectEmpty(obj) ? {} : { with: obj };
+export const getDbFieldSelectProps = ({ model, query }, propsChecked) => {
+  if (!propsChecked) checkDbQueryProps({ model, query });
+
+  const result = {};
+  if (isObject(query.columns)) result.columns = query.columns;
+  if (isObject(query.with)) result.with = query.with;
+  return result;
 };
