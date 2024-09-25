@@ -4,35 +4,46 @@ import {
   BasicUpdateDTO,
 } from "../../shared/entities/basic/dto.js";
 import { BasicEntity } from "../../shared/entities/basic/entity.js";
+import { toBoolean } from "../../shared/utils/utils.js";
 
-export class Entity extends BasicEntity {
+export class User extends BasicEntity {
   constructor(data = {}) {
     super(data);
     if (data.email !== undefined) this.email = data.email;
     if (data.password !== undefined) this.password = data.password;
-    // if (data.role !== undefined) this.role = data.role;
     if (data.isEmailVerified !== undefined)
-      this.isEmailVerified = data.isEmailVerified;
+      this.isEmailVerified = toBoolean(data.isEmailVerified);
     if (data.isCookieAccepted !== undefined)
-      this.isCookieAccepted = data.isCookieAccepted;
+      this.isCookieAccepted = toBoolean(data.isCookieAccepted);
+    if (data.isAdmin !== undefined) this.isAdmin = toBoolean(data.isAdmin);
+  }
+}
+
+export class UserInfo extends BasicEntity {
+  // не знаю как эти классы разделить в запросах (сделать userController и userInfoController?)
+  constructor(data = {}) {
+    super(data);
     if (data.firstName !== undefined) this.firstName = data.firstName;
     if (data.lastName !== undefined) this.lastName = data.lastName;
-    if (data.image !== undefined) this.image = data.image;
+    if (data.avatar !== undefined) this.avatar = data.avatar;
+    if (data.status !== undefined) this.status = data.status;
   }
 }
 
 export class GetDTO extends BasicGetDTO {
   constructor(entity, isShortResult) {
     super(entity, isShortResult);
-    this.email = entity.email;
+    this.email = entity.email || entity.user?.email;
     if (!isShortResult) {
-      // this.role = entity.role;
       this.isEmailVerified = entity.isEmailVerified;
       this.isCookieAccepted = entity.isCookieAccepted;
+      this.isAdmin = entity.isAdmin;
+      this.userInfoId = entity.userInfoId; // temp
     }
     this.firstName = entity.firstName;
     this.lastName = entity.lastName;
-    this.image = entity.image;
+    this.avatar = entity.avatar;
+    this.status = entity.status;
   }
 }
 export class CreateDTO extends GetDTO {

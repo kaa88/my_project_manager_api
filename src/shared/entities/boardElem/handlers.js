@@ -17,7 +17,7 @@ export class BoardElemHandlers extends BasicHandlers {
   }
 }
 
-/* Role rights
+/* Access
 create - team / project members
 update - team / project members
 get - team / project members
@@ -92,13 +92,26 @@ function FindManyHandler(model, protoHandler) {
 
 //
 
+// const setQueryIds = (req) => {
+//   req.queryIds = req.queryIds || {};
+//   if (!req.queryIds.boardId)
+//     req.queryIds = getIdsFromQuery(["id", "projectId", "boardId"], req.query);
+// };
+
+// const setQueryIds = (req) => {
+//   const desiredIds = [];
+//   if (req.id) desiredIds.push("id");
+//   if (!req.id || req.relativeId || req.projectId || req.boardId)
+//     desiredIds.push("relativeId", "projectId", "boardId");
+
+//   if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
+// };
 const setQueryIds = (req) => {
-  req.queryIds = req.queryIds || {};
-  if (!req.queryIds.boardId)
-    req.queryIds = getIdsFromQuery(["id", "projectId", "boardId"], {
-      ...req.query,
-      ...req.params,
-    });
+  const desiredIds = ["projectId", "boardId"];
+  if (req.id) desiredIds.push("id");
+  if (!req.id || req.relativeId) desiredIds.push("relativeId");
+
+  if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
 };
 
 ///////////////////////

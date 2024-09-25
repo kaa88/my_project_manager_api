@@ -1,28 +1,32 @@
 import { ApiError, Message } from "../../services/error/index.js";
+import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
 import {
   BoardElemDeleteDTO,
   BoardElemGetDTO,
   BoardElemUpdateDTO,
 } from "../../shared/entities/boardElem/dto.js";
-import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
+import { GetDTO as CommentDTO } from "../comment/map.js";
+import { GetDTO as FileDTO } from "../file/map.js";
 import {
-  getShortDateString,
   isArray,
   isObject,
+  toBoolean,
   toNumber,
   toNumberArrayOrNull,
   toNumberOrNull,
 } from "../../shared/utils/utils.js";
+import { getShortDateString } from "../../shared/utils/date.js";
 
 export class Task extends BoardElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.title !== undefined) this.title = data.title;
 
-    if (data.description !== undefined) this.description = data.description;
+    if (data.description !== undefined)
+      this.description = data.description || "";
 
     if (data.expire !== undefined)
-      this.expire = data.expire ? getShortDateString(data.expire) : null;
+      this.expire = data.expire ? getShortDateString(data.expire) : "";
 
     if (data.priority !== undefined) this.priority = toNumber(data.priority);
 
@@ -36,22 +40,22 @@ export class Task extends BoardElemEntity {
       this.creatorId = toNumberOrNull(data.creatorId);
 
     if (data.assigneeIds !== undefined)
-      this.assigneeIds = toNumberArrayOrNull(data.assigneeIds);
-
-    if (data.labelIds !== undefined)
-      this.labelIds = toNumberArrayOrNull(data.labelIds);
+      this.assigneeIds = toNumberArrayOrNull(data.assigneeIds) || [];
 
     if (data.taskListId !== undefined)
       this.taskListId = toNumberOrNull(data.taskListId);
+
+    if (data.labelIds !== undefined)
+      this.labelIds = toNumberArrayOrNull(data.labelIds) || [];
   }
 }
 
 export class Subtask {
   constructor(data) {
     if (isObject(data)) {
-      if (data.id !== undefined) this.id = data.id;
-      if (data.title !== undefined) this.title = data.title;
-      this.complete = data.complete || false;
+      this.id = toNumberOrNull(data.id);
+      if (data.title !== undefined) this.title = String(data.title);
+      if (data.complete !== undefined) this.complete = toBoolean(data.complete);
     }
   }
 }
@@ -66,11 +70,17 @@ export class GetDTO extends BoardElemGetDTO {
     this.subtasks = entity.subtasks;
     this.creatorId = entity.creatorId;
     this.assigneeIds = entity.assigneeIds;
-    this.labelIds = entity.labelIds;
     this.taskListId = entity.taskListId;
+    this.labelIds = entity.labelIds;
     // relations:
-    if (entity.comments) this.comments = entity.comments;
-    if (entity.attachments) this.attachments = entity.attachments;
+    if (entity.comments)
+      this.comments = isArray(entity.comments)
+        ? entity.comments.map((item) => new CommentDTO(item, true))
+        : [];
+    if (entity.files)
+      this.files = isArray(entity.files)
+        ? entity.files.map((item) => new FileDTO(item, true))
+        : [];
   }
 }
 export class CreateDTO extends GetDTO {

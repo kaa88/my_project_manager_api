@@ -5,20 +5,20 @@ import {
   ProjectElemRelations,
 } from "../../shared/entities/projectElem/model.js";
 
-import { teamsToBoards } from "../_JoinTables/teamsToBoards.js";
+import { teamsToBoards } from "../_relationTables/teamsToBoards/model.js";
 
 export const teams = pgTable("teams", {
   ...new ProjectElemModel(),
 
   title: text("title").notNull(),
-  description: text("description"),
-  image: text("image"),
-  leaderId: integer("leaderId").notNull(),
-  memberIds: integer("memberIds").array().notNull(),
+  description: text("description").notNull().default(""),
+  image: text("image").notNull().default(""),
+  leaderId: integer("leader_id").notNull(),
+  memberIds: integer("member_ids").array().notNull(),
 });
 
 export const teamsRelations = relations(teams, ({ one, many }) => ({
   ...new ProjectElemRelations(teams, { one }),
 
-  teamsToBoards: many(teamsToBoards), // ?
+  teamsToBoards: many(teamsToBoards),
 }));

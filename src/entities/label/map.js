@@ -1,17 +1,18 @@
+import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
 import {
-  ProjectElemDeleteDTO,
   ProjectElemGetDTO,
+  ProjectElemDeleteDTO,
   ProjectElemUpdateDTO,
 } from "../../shared/entities/projectElem/dto.js";
-import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
 import { toNumberOrNull } from "../../shared/utils/utils.js";
 
 export class Entity extends ProjectElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.title !== undefined) this.title = data.title;
-    if (data.description !== undefined) this.description = data.description;
-    if (data.color !== undefined) this.color = data.color;
+    if (data.description !== undefined)
+      this.description = data.description || "";
+    if (data.color !== undefined) this.color = data.color || "";
     if (data.creatorId !== undefined)
       this.creatorId = toNumberOrNull(data.creatorId);
   }
@@ -26,6 +27,7 @@ export class GetDTO extends ProjectElemGetDTO {
     this.creatorId = entity.creatorId;
   }
 }
+
 export class CreateDTO extends GetDTO {
   constructor(entity) {
     super(entity);

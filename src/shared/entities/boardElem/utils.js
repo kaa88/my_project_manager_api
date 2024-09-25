@@ -3,13 +3,18 @@ import { db } from "../../../db/db.js";
 import { boards } from "../../../entities/board/model.js";
 
 export const getCurrentBoard = async (boardId, projectId) => {
+  console.log("---check 'with' prop in 'getCurrentBoard'---");
   const board = await db.findOne({
     model: boards,
-    query: { id: boardId, projectId, deletedAt: null },
-    related: {
-      teamsToBoards: { boardId: true },
-      project: { memberIds: true },
-    }, // ???
+    query: {
+      id: boardId,
+      projectId,
+      deletedAt: null,
+      with: {
+        teamsToBoards: { boardId: true },
+        project: { memberIds: true },
+      }, // ???
+    },
   });
   if (!board)
     throw ApiError.badRequest(
@@ -26,7 +31,7 @@ export const checkReadAccess = async (req, errorCallback) => {
     else throw ApiError.forbidden(Message.forbidden());
   };
 
-  const isPrivateBoard = isArray(req.board.teamsToBoards); // ?
+  const isPrivateBoard = isArray(req.board?.teamsToBoards); // ?
 
   const isTeamMember =
     isPrivateBoard && req.board.teamsToBoards.includes(req.user.id); // ?
@@ -35,7 +40,7 @@ export const checkReadAccess = async (req, errorCallback) => {
 
   if (!isPrivateBoard) {
     const isProjectMember =
-      isArray(req.board.project?.memberIds) &&
+      isArray(req.board?.project?.memberIds) &&
       req.board.project.memberIds.includes(req.user.id);
 
     if (!isProjectMember) handleError();

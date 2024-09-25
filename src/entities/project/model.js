@@ -5,9 +5,8 @@ export const projects = pgTable("projects", {
   ...new BasicModel(),
 
   title: text("title").notNull(),
-  // systemName: text("systemName"), // ? для вывода в строке браузера, как в gitlab
-  description: text("description"),
-  ownerId: integer("ownerId").notNull(),
-  adminIds: integer("adminIds").array(),
-  memberIds: integer("memberIds").array().notNull(),
+  description: text("description").notNull().default(""),
+  ownerId: integer("owner_id").notNull(),
+  adminIds: integer("admin_ids").array().notNull(),
+  memberIds: integer("member_ids").array().notNull(),
 });

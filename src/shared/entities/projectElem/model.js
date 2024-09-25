@@ -1,13 +1,12 @@
-import { integer, serial } from "drizzle-orm/pg-core";
-import { projects } from "../../../entities/project/model.js";
+import { integer } from "drizzle-orm/pg-core";
 import { BasicModel } from "../basic/model.js";
+import { projects } from "../../../entities/project/model.js";
 
 export class ProjectElemModel extends BasicModel {
   constructor() {
     super();
-    this.id = integer("id").notNull().unique();
-    this.globalId = serial("globalId").primaryKey();
-    this.projectId = integer("projectId")
+    this.relativeId = integer("relative_id").notNull().default(0);
+    this.projectId = integer("project_id")
       .notNull()
       .references(() => projects.id);
   }

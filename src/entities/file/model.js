@@ -10,16 +10,14 @@ import { tasks } from "../task/model.js";
 export const files = pgTable("files", {
   ...new BoardElemModel(),
 
-  title: text("title"),
-  description: text("description"),
-  path: text("path").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  path: text("path").notNull(),
   type: text("type").notNull(),
   size: text("size").notNull(),
-  authorId: integer("authorId").notNull(),
+  creatorId: integer("creator_id").notNull(),
   // relations:
-  taskId: integer("taskId")
-    .notNull()
-    .references(() => tasks.id),
+  taskId: integer("task_id").notNull(),
 });
 
 export const filesRelations = relations(files, ({ one }) => ({

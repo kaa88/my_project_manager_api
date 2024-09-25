@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { ProjectElemRelations } from "../../shared/entities/projectElem/model.js";
 
 import { boards } from "./model.js";
-import { teamsToBoards } from "../_JoinTables/teamsToBoards.js";
+import { teamsToBoards } from "../_relationTables/teamsToBoards/model.js";
 import { comments } from "../comment/model.js";
 import { files } from "../file/model.js";
 import { tasks } from "../task/model.js";
@@ -13,7 +13,7 @@ import { tasks } from "../task/model.js";
 export const boardsRelations = relations(boards, ({ one, many }) => ({
   ...new ProjectElemRelations(boards, { one }),
 
-  teamsToBoards: many(teamsToBoards), // ?
+  teamsToBoards: many(teamsToBoards),
 
   comments: many(comments),
   files: many(files),

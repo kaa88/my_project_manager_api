@@ -1,27 +1,23 @@
 import { ApiError, Message } from "../../services/error/index.js";
-import {
-  ProjectElemDeleteDTO,
-  ProjectElemGetDTO,
-  ProjectElemUpdateDTO,
-} from "../../shared/entities/projectElem/dto.js";
 import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
 import {
-  toNumberArrayOrNull,
-  toNumberOrNull,
-} from "../../shared/utils/utils.js";
+  ProjectElemGetDTO,
+  ProjectElemDeleteDTO,
+  ProjectElemUpdateDTO,
+} from "../../shared/entities/projectElem/dto.js";
+import { GetDTO as TeamsToBoardsDTO } from "../_relationTables/teamsToBoards/map.js";
+import { GetDTO as CommentDTO } from "../comment/map.js";
+import { GetDTO as FileDTO } from "../file/map.js";
+import { GetDTO as TaskDTO } from "../task/map.js";
+import { isArray, isObject, toNumberOrNull } from "../../shared/utils/utils.js";
 
 export class Board extends ProjectElemEntity {
   constructor(data = {}) {
     super(data);
     if (data.title !== undefined) this.title = data.title;
-    if (data.description !== undefined) this.description = data.description;
-    if (data.image !== undefined) this.image = data.image;
-
-    if (data.creatorId !== undefined)
-      this.creatorId = toNumberOrNull(data.creatorId);
-
-    // if (data.listOrder !== undefined)
-    //   this.listOrder = toNumberArrayOrNull(data.listOrder);
+    if (data.description !== undefined)
+      this.description = data.description || "";
+    if (data.image !== undefined) this.image = data.image || "";
 
     if (data.taskLists !== undefined) {
       if (!isArray(data.taskLists))
@@ -29,18 +25,21 @@ export class Board extends ProjectElemEntity {
       this.taskLists = data.taskLists.map((item) => new TaskList(item));
     }
 
-    // rename to teamIds ?
-    if (data.teams !== undefined) this.teams = toNumberArrayOrNull(data.teams);
+    if (data.creatorId !== undefined)
+      this.creatorId = toNumberOrNull(data.creatorId);
+
+    // controller handled props: teamIds
   }
 }
 
 export class TaskList {
   constructor(data) {
     if (isObject(data)) {
-      if (data.id !== undefined) this.id = data.id;
-      if (data.title !== undefined) this.title = data.title;
-      if (data.description !== undefined) this.description = data.description;
-      if (data.color !== undefined) this.color = data.color;
+      this.id = toNumberOrNull(data.id);
+      if (data.title !== undefined) this.title = String(data.title);
+      if (data.description !== undefined)
+        this.description = String(data.description);
+      if (data.color !== undefined) this.color = String(data.color);
     }
   }
 }
@@ -51,17 +50,27 @@ export class GetDTO extends ProjectElemGetDTO {
     this.title = entity.title;
     this.description = entity.description;
     this.image = entity.image;
-    this.creatorId = entity.creatorId;
     this.taskLists = entity.taskLists;
+    this.creatorId = entity.creatorId;
     // relations:
-    if (entity.comments) this.comments = entity.comments;
-    if (entity.files) this.files = entity.files;
-    if (entity.tasks) this.tasks = entity.tasks;
-    // if (entity.taskLists) this.taskLists = entity.taskLists;
+    if (entity.teamsToBoards)
+      this.teamsToBoards = isArray(entity.teamsToBoards)
+        ? entity.teamsToBoards.map((item) => new TeamsToBoardsDTO(item, true))
+        : [];
+    if (entity.comments)
+      this.comments = isArray(entity.comments)
+        ? entity.comments.map((item) => new CommentDTO(item, true))
+        : [];
+    if (entity.files)
+      this.files = isArray(entity.files)
+        ? entity.files.map((item) => new FileDTO(item, true))
+        : [];
+    if (entity.tasks)
+      this.tasks = isArray(entity.tasks)
+        ? entity.tasks.map((item) => new TaskDTO(item, true))
+        : [];
 
-    if (entity.team) this.team = entity.team; // ?
-    if (entity.teams) this.teams = entity.teams; // ?
-    if (entity.teamsToBoards) this.teamsToBoards = entity.teamsToBoards; // ?
+    // controller handled props: teamIds
   }
 }
 export class CreateDTO extends GetDTO {

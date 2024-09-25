@@ -3,7 +3,9 @@ import { BasicController } from "../../shared/entities/basic/controller.js";
 import { controller as boardController } from "../board/controller.js";
 import { controller as labelController } from "../label/controller.js";
 import { projects } from "./model.js";
-import { Entity, GetDTO, CreateDTO, UpdateDTO, DeleteDTO } from "./map.js";
+import { Entity } from "./entity.js";
+import { CreateDTO, UpdateDTO, DeleteDTO } from "./dto.js";
+import { GetDTOWithRelations } from "./dtoWithRelations.js";
 import { getCurrentProject } from "../../shared/entities/projectElem/utils.js";
 import { getIdsFromQuery } from "../../shared/utils/idsFromQuery.js";
 import {
@@ -16,7 +18,7 @@ export const controller = new BasicController({
   model: projects,
   entity: Entity,
   dto: {
-    get: GetDTO,
+    get: GetDTOWithRelations,
     create: CreateDTO,
     update: UpdateDTO,
     delete: DeleteDTO,
@@ -34,10 +36,10 @@ controller.handlers = {
 };
 controller.createControllsFromHandlers();
 
-/* Role rights
-create - any
-update - admin, project owner
-get - members
+/* Access
+create - any user
+update - project owner/admin
+get - project member
 */
 
 function CreateHandler(protoHandler) {
@@ -81,7 +83,7 @@ function CreateHandler(protoHandler) {
 
 function UpdateHandler(protoHandler) {
   return async (req) => {
-    const { id } = getIdsFromQuery(["id"], req.params);
+    const { id } = getIdsFromQuery(["id"], req.query);
     req.project = await getCurrentProject(id);
     checkWriteAccess(req);
 

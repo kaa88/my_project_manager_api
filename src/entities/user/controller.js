@@ -3,20 +3,28 @@ import { validationResult } from "express-validator";
 import { ApiError, Message } from "../../services/error/index.js";
 import { db } from "../../db/db.js";
 import { BasicController } from "../../shared/entities/basic/controller.js";
-import { users as model } from "./model.js";
-import { CreateDTO, DeleteDTO, Entity, GetDTO, UpdateDTO } from "./map.js";
+import { users } from "./model.js";
+import { usersInfo } from "./model.js";
+import {
+  CreateDTO,
+  DeleteDTO,
+  GetDTO,
+  UpdateDTO,
+  User,
+  UserInfo,
+} from "./map.js";
 import { TokenService } from "../../services/auth/TokenService.js";
 import { getIdsFromQuery } from "../../shared/utils/idsFromQuery.js";
 import { checkReadAccess, checkWriteAccess } from "./utils.js";
 
 export const controller = new BasicController({
-  model,
-  entity: Entity,
+  model: users,
+  entity: User,
   dto: {
-    get: GetDTO,
     create: CreateDTO,
     update: UpdateDTO,
     delete: DeleteDTO,
+    get: GetDTO,
   },
 });
 
@@ -25,7 +33,7 @@ controller.handlers = {
   update: new UpdateHandler(controller.handlers.update),
   delete: new DeleteHandler(controller.handlers.delete),
   findOne: new FindOneHandler(controller.handlers.findOne),
-  findMany: controller.handlers.findMany,
+  findMany: new FindManyHandler(controller.handlers.findMany),
 
   changePassword: new ChangePasswordHandler(controller.handlers.update),
   restorePassword: new RestorePasswordHandler(),
@@ -43,14 +51,15 @@ controller.handlers = {
 };
 controller.createControllsFromHandlers();
 
-/* Role rights
+/* Access
 create - any
 update - same user
 get - same user
-get many - any
+get many - any user
 */
 
-const ADD_TOKEN_TO_DTO = true;
+const HASH_SALT = 5;
+const ADD_ACCESS_TOKEN_TO_RESPONSE = true;
 
 function CreateHandler(protoHandler) {
   return async (req, res) => {
@@ -60,19 +69,49 @@ function CreateHandler(protoHandler) {
 
     const { email, password } = req.body;
 
+    // Check if user exists
     const existUser = await db.findOne({
-      model,
+      model: users,
       query: { email, deletedAt: null },
     });
     if (existUser)
       throw ApiError.badRequest(`User with email '${email}' already exists`);
+    //
 
-    req.body.password = await bcrypt.hash(password, 5);
+    delete req.body.id;
+    delete req.body.createdAt;
+    delete req.body.updatedAt;
+    delete req.body.deletedAt;
+
+    req.body.password = await bcrypt.hash(password, HASH_SALT);
     req.body.lastVisitAt = new Date();
     req.body.isEmailVerified = false;
-    req.body.firstName = req.body.firstName || email.split("@")[0];
 
     const protoDTO = await protoHandler(req);
+
+    console.log("userId", protoDTO.id);
+
+    // Create userInfo
+    req.body.firstName = req.body.firstName || email.split("@")[0];
+    const userInfoResponse = await db.create({
+      model: usersInfo,
+      values: { ...new UserInfo(req.body), userId: protoDTO.id },
+    });
+    // надо делать апдейт user для добавления userInfoId ???
+    //
+    // const userUpdateResponse = await db.update({
+    //   model: users,
+    //   query: { id: protoDTO.id },
+    //   values: { userInfoId: userInfoResponse.id },
+    // });
+    // сделать 2 сущности user и userinfo с отдельными контроллерами и роутами
+    // убрать у юзера userInfoId, т.к. это будет отдельный роут
+    const userResponse = await db.findOne({
+      model: users,
+      query: { id: protoDTO.id, with: { userInfo: true } },
+    });
+    console.log(userResponse);
+    //
 
     const { accessToken, refreshToken } = TokenService.generateTokens({
       user_id: protoDTO.id,
@@ -80,12 +119,13 @@ function CreateHandler(protoHandler) {
     });
 
     res.cookie(...TokenService.getAccessCookie(accessToken));
-    res.cookie(...TokenService.getRefreshCookie(refreshToken));
-    if (ADD_TOKEN_TO_DTO) protoDTO.accessToken = accessToken;
 
     // send email
 
-    return protoDTO;
+    const response = { data: protoDTO, refreshToken };
+    if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
+
+    return response;
   };
 }
 
@@ -116,17 +156,25 @@ function FindOneHandler(protoHandler) {
   };
 }
 
+function FindManyHandler(protoHandler) {
+  return async (req) => {
+    // полностью переписать без proto, т.к. другой entity и dto
+    checkReadAccess(req);
+    return await protoHandler(req);
+  };
+}
+
 function ChangePasswordHandler(protoHandler) {
   return async (req) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       throw ApiError.badRequest(Message.validation(errors));
 
-    const { id } = getIdsFromQuery(["id"], req.params);
+    const { id } = getIdsFromQuery(["id"], req.query);
     if (id !== req.user.id) throw ApiError.forbidden(Message.forbidden());
 
     const currentUser = await db.findOne({
-      model,
+      model: users,
       query: { id, deletedAt: null },
     });
     if (!currentUser) throw ApiError.notFound(Message.notFound({ id }));
@@ -138,7 +186,7 @@ function ChangePasswordHandler(protoHandler) {
     );
     if (!comparePassword) throw ApiError.badRequest("Incorrect old password");
 
-    req.body = { password: await bcrypt.hash(newPassword, 5) };
+    req.body = { password: await bcrypt.hash(newPassword, HASH_SALT) };
 
     return await protoHandler(req);
   };
@@ -149,7 +197,10 @@ function RestorePasswordHandler() {
     const { email } = req.body;
     if (!email) throw ApiError.badRequest("Email required");
 
-    const user = await db.findOne({ model, query: { email, deletedAt: null } });
+    const user = await db.findOne({
+      model: users,
+      query: { email, deletedAt: null },
+    });
     if (user) console.log(`sending email to ${email}`);
 
     // send email
@@ -167,12 +218,12 @@ function RestorePasswordConfirmHandler(protoHandler) {
     const { email, code, newPassword } = req.body; // ?
 
     // const currentUser = await db.findOne({
-    //   model,
+    //   model:users,
     //   query: { id, deletedAt: null },
     // });
     // if (!currentUser) throw ApiError.notFound(Message.notFound({ id }));
 
-    req.body = { password: await bcrypt.hash(newPassword, 5) };
+    req.body = { password: await bcrypt.hash(newPassword, HASH_SALT) };
 
     // ???
 
@@ -191,7 +242,7 @@ function LoginHandler() {
     );
 
     const candidate = await db.findOne({
-      model,
+      model: users,
       query: { email, deletedAt: null },
     });
     if (!candidate) throw INCORRECT_CREDENTIALS_ERROR;
@@ -208,16 +259,16 @@ function LoginHandler() {
     });
 
     res.cookie(...TokenService.getAccessCookie(accessToken));
-    res.cookie(...TokenService.getRefreshCookie(refreshToken));
 
-    const response = await db.update({
-      model,
+    const dbResponse = await db.update({
+      model: users,
       query: { email },
       values: { lastVisitAt: new Date() },
     });
-    const dto = new GetDTO(response);
-    if (ADD_TOKEN_TO_DTO) dto.accessToken = accessToken;
-    return dto;
+
+    const response = { data: new GetDTO(dbResponse), refreshToken };
+    if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
+    return response;
   };
 }
 
@@ -240,7 +291,7 @@ function RefreshHandler() {
 
     const { id, email } = tokenData;
     const user = await db.findOne({
-      model,
+      model: users,
       query: { id, email, deletedAt: null },
     });
     if (!user) throw ApiError.notFound("User not found");
@@ -251,16 +302,15 @@ function RefreshHandler() {
     });
 
     res.cookie(...TokenService.getAccessCookie(accessToken));
-    res.cookie(...TokenService.getRefreshCookie(refreshToken));
 
     db.update({
-      model,
+      model: users,
       query: { id },
       values: { lastVisitAt: new Date() },
     });
 
-    const response = { message: "Token has been refreshed" };
-    if (ADD_TOKEN_TO_DTO) response.accessToken = accessToken;
+    const response = { message: "Token has been refreshed", refreshToken };
+    if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
     return response;
   };
 }

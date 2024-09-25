@@ -12,12 +12,10 @@ export const comments = pgTable("comments", {
 
   content: text("content").notNull(),
   rating: smallint("rating").notNull().default(0),
-  authorId: integer("authorId").notNull(),
+  creatorId: integer("creator_id").notNull(),
   // relations:
-  taskId: integer("taskId")
-    .notNull()
-    .references(() => tasks.id),
-  parentCommentId: integer("parentCommentId"),
+  taskId: integer("task_id").notNull(),
+  parentCommentId: integer("parent_comment_id"), // possibly null
 });
 
 export const commentsRelations = relations(comments, ({ one }) => ({

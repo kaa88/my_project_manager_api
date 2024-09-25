@@ -3,7 +3,7 @@ import { ApiError } from "../error/index.js";
 function userRoleMiddleware(req, res, next) {
   const PID = 2;
   // console.log(req.method, "... injecting projectId =", PID);
-  // req.params.projectId = req.query.projectId = req.body.projectId = PID;
+  // req.query.projectId = req.query.projectId = req.body.projectId = PID;
 
   next();
   // try {

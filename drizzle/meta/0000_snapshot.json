@@ -1,5 +1,5 @@
 {
-  "id": "a8cbd185-e81d-4b7b-a1a6-469bd814715f",
+  "id": "ce0dfa66-d229-483d-b4b6-8b8e9df4b62f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -8,14 +8,14 @@
       "name": "teamsToBoards",
       "schema": "",
       "columns": {
-        "teamId": {
-          "name": "teamId",
+        "team_id": {
+          "name": "team_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "boardId": {
-          "name": "boardId",
+        "board_id": {
+          "name": "board_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -23,39 +23,39 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "teamsToBoards_teamId_teams_id_fk": {
-          "name": "teamsToBoards_teamId_teams_id_fk",
+        "teamsToBoards_team_id_teams__id_fk": {
+          "name": "teamsToBoards_team_id_teams__id_fk",
           "tableFrom": "teamsToBoards",
           "tableTo": "teams",
           "columnsFrom": [
-            "teamId"
+            "team_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "teamsToBoards_boardId_boards_id_fk": {
-          "name": "teamsToBoards_boardId_boards_id_fk",
+        "teamsToBoards_board_id_boards__id_fk": {
+          "name": "teamsToBoards_board_id_boards__id_fk",
           "tableFrom": "teamsToBoards",
           "tableTo": "boards",
           "columnsFrom": [
-            "boardId"
+            "board_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "teamsToBoards_teamId_boardId_pk": {
-          "name": "teamsToBoards_teamId_boardId_pk",
+        "teamsToBoards_team_id_board_id_pk": {
+          "name": "teamsToBoards_team_id_board_id_pk",
           "columns": [
-            "teamId",
-            "boardId"
+            "team_id",
+            "board_id"
           ]
         }
       },
@@ -65,40 +65,41 @@
       "name": "boards",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -113,22 +114,25 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "image": {
           "name": "image",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
-        "taskLists": {
-          "name": "taskLists",
+        "task_lists": {
+          "name": "task_lists",
           "type": "json",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'[]'"
         },
-        "creatorId": {
-          "name": "creatorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -136,75 +140,68 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "boards_projectId_projects_id_fk": {
-          "name": "boards_projectId_projects_id_fk",
+        "boards_project_id_projects__id_fk": {
+          "name": "boards_project_id_projects__id_fk",
           "tableFrom": "boards",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "boards_id_unique": {
-          "name": "boards_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.comments": {
       "name": "comments",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "boardId": {
-          "name": "boardId",
+        "board_id": {
+          "name": "board_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -222,20 +219,20 @@
           "notNull": true,
           "default": 0
         },
-        "authorId": {
-          "name": "authorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "taskId": {
-          "name": "taskId",
+        "task_id": {
+          "name": "task_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "parentCommentId": {
-          "name": "parentCommentId",
+        "parent_comment_id": {
+          "name": "parent_comment_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -243,101 +240,81 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "comments_projectId_projects_id_fk": {
-          "name": "comments_projectId_projects_id_fk",
+        "comments_project_id_projects__id_fk": {
+          "name": "comments_project_id_projects__id_fk",
           "tableFrom": "comments",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "comments_boardId_boards_id_fk": {
-          "name": "comments_boardId_boards_id_fk",
+        "comments_board_id_boards__id_fk": {
+          "name": "comments_board_id_boards__id_fk",
           "tableFrom": "comments",
           "tableTo": "boards",
           "columnsFrom": [
-            "boardId"
+            "board_id"
           ],
           "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "comments_taskId_tasks_id_fk": {
-          "name": "comments_taskId_tasks_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "tasks",
-          "columnsFrom": [
-            "taskId"
-          ],
-          "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "comments_id_unique": {
-          "name": "comments_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.files": {
       "name": "files",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "boardId": {
-          "name": "boardId",
+        "board_id": {
+          "name": "board_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -346,13 +323,14 @@
           "name": "title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "path": {
           "name": "path",
@@ -372,14 +350,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "authorId": {
-          "name": "authorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "taskId": {
-          "name": "taskId",
+        "task_id": {
+          "name": "task_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -387,102 +365,75 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "files_projectId_projects_id_fk": {
-          "name": "files_projectId_projects_id_fk",
+        "files_project_id_projects__id_fk": {
+          "name": "files_project_id_projects__id_fk",
           "tableFrom": "files",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "files_boardId_boards_id_fk": {
-          "name": "files_boardId_boards_id_fk",
+        "files_board_id_boards__id_fk": {
+          "name": "files_board_id_boards__id_fk",
           "tableFrom": "files",
           "tableTo": "boards",
           "columnsFrom": [
-            "boardId"
+            "board_id"
           ],
           "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "files_taskId_tasks_id_fk": {
-          "name": "files_taskId_tasks_id_fk",
-          "tableFrom": "files",
-          "tableTo": "tasks",
-          "columnsFrom": [
-            "taskId"
-          ],
-          "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "files_id_unique": {
-          "name": "files_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        },
-        "files_path_unique": {
-          "name": "files_path_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "path"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.labels": {
       "name": "labels",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -497,16 +448,18 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "color": {
           "name": "color",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
-        "creatorId": {
-          "name": "creatorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -514,57 +467,49 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "labels_projectId_projects_id_fk": {
-          "name": "labels_projectId_projects_id_fk",
+        "labels_project_id_projects__id_fk": {
+          "name": "labels_project_id_projects__id_fk",
           "tableFrom": "labels",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "labels_id_unique": {
-          "name": "labels_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.projects": {
       "name": "projects",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "deletedAt": {
-          "name": "deletedAt",
+        "deleted_at": {
+          "name": "deleted_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -579,22 +524,23 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
-        "ownerId": {
-          "name": "ownerId",
+        "owner_id": {
+          "name": "owner_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "adminIds": {
-          "name": "adminIds",
+        "admin_ids": {
+          "name": "admin_ids",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "memberIds": {
-          "name": "memberIds",
+        "member_ids": {
+          "name": "member_ids",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": true
@@ -609,46 +555,47 @@
       "name": "tasks",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "boardId": {
-          "name": "boardId",
+        "board_id": {
+          "name": "board_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -663,13 +610,15 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "expire": {
           "name": "expire",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "priority": {
           "name": "priority",
@@ -682,111 +631,105 @@
           "name": "subtasks",
           "type": "json",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'[]'"
         },
-        "creatorId": {
-          "name": "creatorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "assigneeIds": {
-          "name": "assigneeIds",
+        "assignee_ids": {
+          "name": "assignee_ids",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "labelIds": {
-          "name": "labelIds",
-          "type": "integer[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "taskListId": {
-          "name": "taskListId",
+        "task_list_id": {
+          "name": "task_list_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label_ids": {
+          "name": "label_ids",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "tasks_projectId_projects_id_fk": {
-          "name": "tasks_projectId_projects_id_fk",
+        "tasks_project_id_projects__id_fk": {
+          "name": "tasks_project_id_projects__id_fk",
           "tableFrom": "tasks",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "tasks_boardId_boards_id_fk": {
-          "name": "tasks_boardId_boards_id_fk",
+        "tasks_board_id_boards__id_fk": {
+          "name": "tasks_board_id_boards__id_fk",
           "tableFrom": "tasks",
           "tableTo": "boards",
           "columnsFrom": [
-            "boardId"
+            "board_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "tasks_id_unique": {
-          "name": "tasks_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.teams": {
       "name": "teams",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "globalId": {
-          "name": "globalId",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "projectId": {
-          "name": "projectId",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relative_id": {
+          "name": "relative_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -801,22 +744,24 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "image": {
           "name": "image",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
-        "leaderId": {
-          "name": "leaderId",
+        "leader_id": {
+          "name": "leader_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "memberIds": {
-          "name": "memberIds",
+        "member_ids": {
+          "name": "member_ids",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": true
@@ -824,57 +769,49 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "teams_projectId_projects_id_fk": {
-          "name": "teams_projectId_projects_id_fk",
+        "teams_project_id_projects__id_fk": {
+          "name": "teams_project_id_projects__id_fk",
           "tableFrom": "teams",
           "tableTo": "projects",
           "columnsFrom": [
-            "projectId"
+            "project_id"
           ],
           "columnsTo": [
-            "id"
+            "_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "teams_id_unique": {
-          "name": "teams_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.users": {
       "name": "users",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "_id": {
+          "name": "_id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "deletedAt": {
-          "name": "deletedAt",
+        "deleted_at": {
+          "name": "deleted_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -891,60 +828,135 @@
           "primaryKey": false,
           "notNull": true
         },
-        "accessToken": {
-          "name": "accessToken",
-          "type": "text",
+        "is_email_verified": {
+          "name": "is_email_verified",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": false
         },
-        "refreshToken": {
-          "name": "refreshToken",
-          "type": "text",
+        "is_cookie_accepted": {
+          "name": "is_cookie_accepted",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": false
         },
-        "lastVisitAt": {
-          "name": "lastVisitAt",
+        "is_admin": {
+          "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "last_visit_at": {
+          "name": "last_visit_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "isEmailVerified": {
-          "name": "isEmailVerified",
-          "type": "boolean",
+        "refresh_tokens": {
+          "name": "refresh_tokens",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "isCookieAccepted": {
-          "name": "isCookieAccepted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "firstName": {
-          "name": "firstName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lastName": {
-          "name": "lastName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
+    },
+    "public.usersInfo": {
+      "name": "usersInfo",
+      "schema": "",
+      "columns": {
+        "_id": {
+          "name": "_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "avatar": {
+          "name": "avatar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usersInfo_user_id_users__id_fk": {
+          "name": "usersInfo_user_id_users__id_fk",
+          "tableFrom": "usersInfo",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }

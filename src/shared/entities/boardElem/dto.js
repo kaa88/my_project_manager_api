@@ -1,14 +1,15 @@
 import {
-  ProjectElemDeleteDTO,
   ProjectElemGetDTO,
+  ProjectElemDeleteDTO,
   ProjectElemUpdateDTO,
 } from "../projectElem/dto.js";
+import { GetDTO as BoardDTO } from "../../../entities/board/map.js";
 
 export class BoardElemGetDTO extends ProjectElemGetDTO {
   constructor(entity, isShortResult) {
     super(entity, isShortResult);
     this.boardId = entity.boardId;
-    if (entity.board) this.board = entity.board;
+    if (entity.board) this.board = new BoardDTO(entity.board, true);
   }
 }
 
@@ -24,4 +25,9 @@ export class BoardElemUpdateDTO extends ProjectElemUpdateDTO {
   }
 }
 
-export const BoardElemDeleteDTO = ProjectElemDeleteDTO;
+export class BoardElemDeleteDTO extends ProjectElemDeleteDTO {
+  constructor(entity) {
+    super(entity);
+    this.boardId = entity.boardId;
+  }
+}

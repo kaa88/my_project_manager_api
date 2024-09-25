@@ -13,16 +13,14 @@ export const tasks = pgTable("tasks", {
   ...new BoardElemModel(),
 
   title: text("title").notNull(),
-  description: text("description"),
-  expire: text("expire"), // 'YYYY-MM-DD'
+  description: text("description").notNull().default(""),
+  expire: text("expire").notNull().default(""), // 'YYYY-MM-DD'
   priority: smallint("priority").notNull().default(0), // 0, 1, 2
-  subtasks: json("subtasks"), // array
-  creatorId: integer("creatorId").notNull(), // one
-  assigneeIds: integer("assigneeIds").array(),
-  labelIds: integer("labelIds").array(),
-  // relations:
-  taskListId: integer("taskListId").notNull(),
-  // .references(() => taskLists.id),
+  subtasks: json("subtasks").notNull().default(JSON.stringify([])), // array
+  creatorId: integer("creator_id").notNull(),
+  assigneeIds: integer("assignee_ids").array().notNull(),
+  taskListId: integer("task_list_id").notNull(),
+  labelIds: integer("label_ids").array().notNull(),
 });
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({

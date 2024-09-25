@@ -5,8 +5,8 @@ export const boards = pgTable("boards", {
   ...new ProjectElemModel(),
 
   title: text("title").notNull(),
-  description: text("description"),
-  image: text("image"),
-  taskLists: json("taskLists"),
-  creatorId: integer("creatorId").notNull(),
+  description: text("description").notNull().default(""),
+  image: text("image").notNull().default(""),
+  taskLists: json("task_lists").notNull().default(JSON.stringify([])),
+  creatorId: integer("creator_id").notNull(),
 });

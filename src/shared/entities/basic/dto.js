@@ -1,19 +1,12 @@
-export class BasicDTO {
+export class BasicGetDTO {
   constructor(entity, isShortResult) {
+    // use 'isShortResult' e.g. if you want to hide some user props from other users
     this.id = entity.id;
     if (!isShortResult) {
       this.createdAt = entity.createdAt;
       this.updatedAt = entity.updatedAt;
       if (entity.deletedAt) this.deletedAt = entity.deletedAt;
     }
-  }
-}
-
-export class BasicGetDTO extends BasicDTO {
-  constructor(entity, isShortResult) {
-    // use 'isShortResult' for insecure queries, e.g. if you want to hide some user props from other users
-    super(entity, isShortResult);
-    // ...specific values
   }
 }
 
@@ -32,7 +25,7 @@ export class BasicUpdateDTO {
     }
 
     const dto = new GetDTO({
-      ...new BasicDTO(entity), // add id and dates
+      ...new GetDTO(entity), // add id and dates
       ...updatedEntityValues,
     });
 
@@ -46,7 +39,7 @@ export class BasicUpdateDTO {
 
 export class BasicDeleteDTO {
   constructor(entity) {
-    this.id = entity.id;
     this.message = "Successfully deleted";
+    this.id = entity.id;
   }
 }

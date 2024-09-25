@@ -9,9 +9,9 @@ export const labels = pgTable("labels", {
   ...new ProjectElemModel(),
 
   title: text("title").notNull(),
-  description: text("description"),
-  color: text("color"),
-  creatorId: integer("creatorId").notNull(),
+  description: text("description").notNull().default(""),
+  color: text("color").notNull().default(""),
+  creatorId: integer("creator_id").notNull(),
 });
 
 export const labelsRelations = relations(labels, ({ one }) => ({

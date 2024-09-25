@@ -1,16 +1,16 @@
 import { relations } from "drizzle-orm";
 import { pgTable, integer, primaryKey } from "drizzle-orm/pg-core";
 
-import { teams } from "../team/model.js";
-import { boards } from "../board/model.js";
+import { teams } from "../../team/model.js";
+import { boards } from "../../board/model.js";
 
 export const teamsToBoards = pgTable(
   "teamsToBoards",
   {
-    teamId: integer("teamId")
+    teamId: integer("team_id")
       .notNull()
       .references(() => teams.id),
-    boardId: integer("boardId")
+    boardId: integer("board_id")
       .notNull()
       .references(() => boards.id),
   },

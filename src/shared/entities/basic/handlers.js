@@ -11,6 +11,7 @@ import { PaginationDTO, PaginationParams } from "../../mappers/pagination.js";
 import { BasicSearchParams } from "../../mappers/search.js";
 import { getIdsFromQuery } from "../../utils/idsFromQuery.js";
 import { isObject } from "../../utils/utils.js";
+import { FieldSelectParams } from "../../mappers/fieldSelect.js";
 
 export class BasicHandlers {
   constructor({ model, entity = BasicEntity, dto = {} }) {
@@ -46,6 +47,11 @@ export class BasicHandlers {
 
 function CreateHandler(model, Entity, CreateDTO) {
   return async (req) => {
+    delete req.body.id;
+    delete req.body.createdAt;
+    delete req.body.updatedAt;
+    delete req.body.deletedAt;
+
     const values = new Entity(req.body);
 
     const response = await db.create({ model, values });
@@ -61,6 +67,10 @@ function UpdateHandler(model, Entity, UpdateDTO) {
     const query = req.queryIds;
 
     delete req.body.id;
+    delete req.body.createdAt;
+    delete req.body.updatedAt;
+    delete req.body.deletedAt;
+
     const values = new Entity(req.body);
 
     if (!Object.keys(values).length)
@@ -72,8 +82,6 @@ function UpdateHandler(model, Entity, UpdateDTO) {
 
     const response = await db.update({ model, query, values });
     if (!response) throw ApiError.notFound(Message.notFound(query));
-
-    // console.log(new UpdateDTO(response, values));
 
     return new UpdateDTO(response, values);
   };
@@ -98,22 +106,13 @@ function DeleteHandler(model, Entity, DeleteDTO) {
 function FindOneHandler(model, Entity, GetDTO) {
   return async (req) => {
     setQueryIds(req);
-    const query = { ...new Entity(req.query), ...req.queryIds };
-
-    // temp
-    const related = {
-      // project: true,
-      // boards: { columns: { id: true } },
-      // teams: { columns: { id: true } },
-      // comments: true,
-      // files: true,
-      // labels: true,
-      // tasks: true,
-      // taskLists: true,
-      // teams: true,
+    const query = {
+      ...new FieldSelectParams(req.query),
+      ...new Entity(req.query),
+      ...req.queryIds,
     };
 
-    const response = await db.findOne({ model, query, related });
+    const response = await db.findOne({ model, query });
     if (!response) throw ApiError.notFound(Message.notFound(query));
 
     return new GetDTO(response);
@@ -125,6 +124,7 @@ function FindManyHandler(model, Entity, GetDTO) {
     const query = {
       ...new PaginationParams(req.query),
       ...new BasicSearchParams(req.query),
+      ...new FieldSelectParams(req.query),
       ...new Entity(req.query),
       deletedAt: null,
     };
@@ -139,10 +139,5 @@ function FindManyHandler(model, Entity, GetDTO) {
 //
 
 const setQueryIds = (req) => {
-  req.queryIds = req.queryIds || {};
-  if (!req.queryIds.id)
-    req.queryIds.id = getIdsFromQuery(["id"], {
-      ...req.query,
-      ...req.params,
-    }).id;
+  if (!req.queryIds) req.queryIds = getIdsFromQuery(["id"], req.query);
 };

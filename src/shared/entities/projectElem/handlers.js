@@ -22,10 +22,9 @@ export class ProjectElemHandlers extends BasicHandlers {
   }
 }
 
-/* Roles
-create - project owner, project admin
-update - project owner, project admin
-get - project members
+/* Access
+write - project owner/admin
+read - project member
 */
 
 function CreateHandler(model, protoHandler) {
@@ -34,13 +33,24 @@ function CreateHandler(model, protoHandler) {
     req.project = await getCurrentProject(req.body.projectId);
     checkWriteAccess(req);
 
-    req.body.id = await db.generateId({
+    req.body.relativeId = await db.generateId({
       model,
       query: { projectId: req.body.projectId },
+      idName: "relativeId",
     });
     req.body.creatorId = req.user.id || req.query.userId || req.body.creatorId;
 
-    return await protoHandler(req);
+    const protoDTO = await protoHandler(req);
+
+    // ?
+    const elemsCount = await db.count({
+      model,
+      query: { projectId: req.body.projectId, relativeId: req.body.relativeId },
+    });
+    console.log("--- elements with same 'relativeId:", elemsCount);
+    //
+
+    return protoDTO;
   };
 }
 
@@ -87,11 +97,24 @@ function FindManyHandler(model, protoHandler) {
 
 //
 
+// const setQueryIds = (req) => {
+//   req.queryIds = req.queryIds || {};
+//   if (!req.queryIds.projectId)
+//     req.queryIds = getIdsFromQuery(["id", "projectId"], req.query);
+// };
+
+// const setQueryIds = (req) => {
+//   const desiredIds = [];
+//   if (req.id) desiredIds.push("id");
+//   if (!req.id || req.relativeId || req.projectId)
+//     desiredIds.push("relativeId", "projectId");
+
+//   if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
+// };
 const setQueryIds = (req) => {
-  req.queryIds = req.queryIds || {};
-  if (!req.queryIds.projectId)
-    req.queryIds = getIdsFromQuery(["id", "projectId"], {
-      ...req.query,
-      ...req.params,
-    });
+  const desiredIds = ["projectId"];
+  if (req.id) desiredIds.push("id");
+  if (!req.id || req.relativeId) desiredIds.push("relativeId");
+
+  if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
 };

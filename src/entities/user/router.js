@@ -36,14 +36,14 @@ router.post(
   nullValueMiddleware,
   controller.create
 );
-router.patch("/update/:id", ...middlewares, controller.update);
-router.delete("/delete/:id", ...middlewares, controller.delete);
+router.patch("/update", ...middlewares, controller.update);
+router.delete("/delete", ...middlewares, controller.delete);
 
-router.get("/:id", ...middlewares, controller.findOne);
-router.get("/", ...middlewares, controller.findMany);
+router.get("/one", ...middlewares, controller.findOne); // userController?
+router.get("/list", ...middlewares, controller.findMany); // userInfoController?
 
 router.post(
-  "/change_password/:id",
+  "/change_password",
   body("newPassword").isStrongPassword(passwordValidationSettings),
   ...middlewares,
   controller.changePassword
@@ -61,5 +61,9 @@ router.post("/logout", controller.logout);
 router.post("/refresh", controller.refresh);
 
 router.post("/upload_image", controller.addPhoto);
+
+// update email
+// update cookie
+// update admin
 
 export default router;

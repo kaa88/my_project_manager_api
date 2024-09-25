@@ -1,15 +1,14 @@
 import { integer } from "drizzle-orm/pg-core";
-import { boards } from "../../../entities/board/model.js";
 import {
   ProjectElemModel,
   ProjectElemRelations,
 } from "../projectElem/model.js";
+import { boards } from "../../../entities/board/model.js";
 
 export class BoardElemModel extends ProjectElemModel {
   constructor() {
     super();
-    // this.projectId = integer("projectId").notNull();
-    this.boardId = integer("boardId")
+    this.boardId = integer("board_id")
       .notNull()
       .references(() => boards.id);
   }
