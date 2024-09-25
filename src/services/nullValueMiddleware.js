@@ -1,11 +1,10 @@
-import { isObject } from "../shared/utils/utils.js";
-import { ApiError } from "./error/apiError.js";
+import { ApiError } from "./error/index.js";
+import { isNullishData, isObject } from "../shared/utils/utils.js";
 
 function nullValueMiddleware(req, res, next) {
   try {
-    // req.params = fixNullableProps(req.params);
-    req.query = fixNullableProps(req.query);
-    req.body = fixNullableProps(req.body);
+    req.query = fixNullishProps(req.query);
+    req.body = fixNullishProps(req.body);
 
     next();
   } catch (e) {
@@ -15,13 +14,11 @@ function nullValueMiddleware(req, res, next) {
 
 export default nullValueMiddleware;
 
-const NULLISH = ["", "null", null];
-
-const fixNullableProps = (props) => {
+const fixNullishProps = (props) => {
   const fixed = {};
   if (isObject(props)) {
     for (let key in props) {
-      fixed[key] = NULLISH.includes(props[key]) ? null : props[key];
+      fixed[key] = isNullishData(props[key]) ? null : props[key];
     }
   }
   return fixed;

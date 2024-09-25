@@ -1,15 +1,16 @@
 import { ApiError, Message } from "../../services/error/index.js";
 import { isArray, isObject } from "./utils.js";
 
-export const getIdsFromQuery = (ids, query) => {
-  if (!isArray(ids)) throw ApiError.internal(Message.incorrect("ids", "array"));
+export const getIdsFromQuery = (idNames, query) => {
+  if (!isArray(idNames))
+    throw ApiError.internal(Message.incorrect("idNames", "array"));
   if (!isObject(query))
     throw ApiError.internal(Message.incorrect("query", "object"));
 
   const result = {};
   const errors = [];
 
-  ids.forEach((key) => {
+  idNames.forEach((key) => {
     if (typeof key !== "string")
       throw ApiError.internal(Message.incorrect("query id key", "string"));
 
@@ -21,4 +22,5 @@ export const getIdsFromQuery = (ids, query) => {
   return result;
 };
 
-export const checkIdsInQuery = (ids, query) => !!getIdsFromQuery(ids, query);
+export const checkIdsInQuery = (idNames, query) =>
+  !!getIdsFromQuery(idNames, query);

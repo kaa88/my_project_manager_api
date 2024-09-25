@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import { ApiError } from "../error/index.js";
-import { isObjectEmpty } from "../../shared/utils/utils.js";
+import { isEmptyObject } from "../../shared/utils/utils.js";
 import { parsePeriod } from "./utils.js";
 
-const ACCESS_TOKEN_EXPIRE_PERIOD = "10m";
+const ACCESS_TOKEN_EXPIRE_PERIOD = "5m";
 const REFRESH_TOKEN_EXPIRE_PERIOD = "14d";
 
 const GENERATION_ERROR = ApiError.internal(
-  'Failed to generate token, "data" is empty.'
+  'Failed to generate token due to "data" is empty.'
 );
 
 export const TokenService = {
@@ -18,14 +18,14 @@ export const TokenService = {
     };
   },
   generateAccessToken(data = {}) {
-    if (isObjectEmpty(data)) throw GENERATION_ERROR;
+    if (isEmptyObject(data)) throw GENERATION_ERROR;
     const token = jwt.sign(data, process.env.ACCESS_SECRET_KEY, {
       expiresIn: ACCESS_TOKEN_EXPIRE_PERIOD,
     });
     return `Bearer ${token}`;
   },
   generateRefreshToken(data = {}) {
-    if (isObjectEmpty(data)) throw GENERATION_ERROR;
+    if (isEmptyObject(data)) throw GENERATION_ERROR;
     const token = jwt.sign(data, process.env.REFRESH_SECRET_KEY, {
       expiresIn: REFRESH_TOKEN_EXPIRE_PERIOD,
     });

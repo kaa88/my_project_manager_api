@@ -1,4 +1,5 @@
-import { isArray, isObject, shortenText } from "../../shared/utils/utils.js";
+import { isArray, isObject } from "../../shared/utils/utils.js";
+import { shortenText } from "../../shared/utils/text.js";
 
 export class Message {
   static required(fields) {
