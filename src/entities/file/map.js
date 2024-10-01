@@ -1,8 +1,9 @@
 import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
 import {
-  BoardElemDeleteDTO,
   BoardElemGetDTO,
+  BoardElemCreateDTO,
   BoardElemUpdateDTO,
+  BoardElemDeleteDTO,
 } from "../../shared/entities/boardElem/dto.js";
 import { GetDTO as TaskDTO } from "../task/map.js";
 import { toNumberOrNull } from "../../shared/utils/utils.js";
@@ -36,15 +37,15 @@ export class GetDTO extends BoardElemGetDTO {
     if (entity.task) this.task = new TaskDTO(entity.task, true);
   }
 }
-export class CreateDTO extends GetDTO {
+export class CreateDTO extends BoardElemCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, GetDTO);
   }
 }
 
 export class UpdateDTO extends BoardElemUpdateDTO {
-  constructor(entity, updatedEntityValues = {}) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}) {
+    super(entity, updatedValues, GetDTO);
   }
 }
 

@@ -3,7 +3,7 @@ import { ApiError, Message } from "../../../services/error/index.js";
 import { isArray, isEmptyObject, isObject } from "../../utils/utils.js";
 
 import nullValueMiddleware from "../../../services/nullValueMiddleware.js";
-import queryParserMiddleware from "../../../services/queryParserMiddleware.js";
+// import queryParserMiddleware from "../../../services/queryParserMiddleware.js";
 import authMiddleware from "../../../services/auth/middleware.js";
 // import userRoleMiddleware from "../../../services/userRoles/middleware.js";
 
@@ -11,7 +11,7 @@ const middlewares = [
   authMiddleware,
   // userRoleMiddleware,
   nullValueMiddleware,
-  queryParserMiddleware,
+  // queryParserMiddleware,
 ];
 
 export function BasicRouter({ controller, omit = [] }) {

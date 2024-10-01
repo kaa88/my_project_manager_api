@@ -1,9 +1,10 @@
 import { ApiError, Message } from "../../services/error/index.js";
 import { BoardElemEntity } from "../../shared/entities/boardElem/entity.js";
 import {
-  BoardElemDeleteDTO,
   BoardElemGetDTO,
+  BoardElemCreateDTO,
   BoardElemUpdateDTO,
+  BoardElemDeleteDTO,
 } from "../../shared/entities/boardElem/dto.js";
 import { GetDTO as CommentDTO } from "../comment/map.js";
 import { GetDTO as FileDTO } from "../file/map.js";
@@ -83,15 +84,15 @@ export class GetDTO extends BoardElemGetDTO {
         : [];
   }
 }
-export class CreateDTO extends GetDTO {
+export class CreateDTO extends BoardElemCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, GetDTO);
   }
 }
 
 export class UpdateDTO extends BoardElemUpdateDTO {
-  constructor(entity, updatedEntityValues = {}) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}) {
+    super(entity, updatedValues, GetDTO);
   }
 }
 

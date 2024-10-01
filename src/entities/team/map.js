@@ -1,8 +1,9 @@
 import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
 import {
   ProjectElemGetDTO,
-  ProjectElemDeleteDTO,
+  ProjectElemCreateDTO,
   ProjectElemUpdateDTO,
+  ProjectElemDeleteDTO,
 } from "../../shared/entities/projectElem/dto.js";
 import { GetDTO as TeamsToBoardsDTO } from "../_relationTables/teamsToBoards/map.js";
 import {
@@ -43,15 +44,15 @@ export class GetDTO extends ProjectElemGetDTO {
     // controller handled props: boardsIds
   }
 }
-export class CreateDTO extends GetDTO {
+export class CreateDTO extends ProjectElemCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, GetDTO);
   }
 }
 
 export class UpdateDTO extends ProjectElemUpdateDTO {
-  constructor(entity, updatedEntityValues = {}) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}) {
+    super(entity, updatedValues, GetDTO);
   }
 }
 

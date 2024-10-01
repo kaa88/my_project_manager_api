@@ -1,5 +1,6 @@
 import {
   ProjectElemGetDTO,
+  ProjectElemCreateDTO,
   ProjectElemDeleteDTO,
   ProjectElemUpdateDTO,
 } from "../projectElem/dto.js";
@@ -13,15 +14,15 @@ export class BoardElemGetDTO extends ProjectElemGetDTO {
   }
 }
 
-export class BoardElemCreateDTO extends BoardElemGetDTO {
+export class BoardElemCreateDTO extends ProjectElemCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, BoardElemGetDTO);
   }
 }
 
 export class BoardElemUpdateDTO extends ProjectElemUpdateDTO {
-  constructor(entity, updatedEntityValues = {}, GetDTO = BoardElemGetDTO) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}, GetDTO = BoardElemGetDTO) {
+    super(entity, updatedValues, GetDTO, BoardElemGetDTO);
   }
 }
 

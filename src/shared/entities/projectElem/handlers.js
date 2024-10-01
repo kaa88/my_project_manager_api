@@ -113,8 +113,8 @@ function FindManyHandler(model, protoHandler) {
 // };
 const setQueryIds = (req) => {
   const desiredIds = ["projectId"];
-  if (req.id) desiredIds.push("id");
-  if (!req.id || req.relativeId) desiredIds.push("relativeId");
+  if (req.query.id) desiredIds.push("id");
+  if (!req.query.id || req.relativeId) desiredIds.push("relativeId");
 
   if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
 };

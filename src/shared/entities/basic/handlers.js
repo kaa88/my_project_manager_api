@@ -47,7 +47,6 @@ export class BasicHandlers {
 
 function CreateHandler(model, Entity, CreateDTO) {
   return async (req) => {
-    delete req.body.id;
     delete req.body.createdAt;
     delete req.body.updatedAt;
     delete req.body.deletedAt;
@@ -83,6 +82,9 @@ function UpdateHandler(model, Entity, UpdateDTO) {
     const response = await db.update({ model, query, values });
     if (!response) throw ApiError.notFound(Message.notFound(query));
 
+    console.log(response, values);
+    console.log(new UpdateDTO(response, values));
+
     return new UpdateDTO(response, values);
   };
 }
@@ -107,13 +109,18 @@ function FindOneHandler(model, Entity, GetDTO) {
   return async (req) => {
     setQueryIds(req);
     const query = {
-      ...new FieldSelectParams(req.query),
       ...new Entity(req.query),
       ...req.queryIds,
     };
 
-    const response = await db.findOne({ model, query });
+    console.log({ ...query, ...new FieldSelectParams(req.query) });
+    const response = await db.findOne({
+      model,
+      query: { ...query, ...new FieldSelectParams(req.query) },
+    });
     if (!response) throw ApiError.notFound(Message.notFound(query));
+
+    console.log(response);
 
     return new GetDTO(response);
   };

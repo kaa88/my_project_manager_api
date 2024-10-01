@@ -1,8 +1,9 @@
 import { ProjectElemEntity } from "../../shared/entities/projectElem/entity.js";
 import {
   ProjectElemGetDTO,
-  ProjectElemDeleteDTO,
+  ProjectElemCreateDTO,
   ProjectElemUpdateDTO,
+  ProjectElemDeleteDTO,
 } from "../../shared/entities/projectElem/dto.js";
 import { toNumberOrNull } from "../../shared/utils/utils.js";
 
@@ -28,15 +29,15 @@ export class GetDTO extends ProjectElemGetDTO {
   }
 }
 
-export class CreateDTO extends GetDTO {
+export class CreateDTO extends ProjectElemCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, GetDTO);
   }
 }
 
 export class UpdateDTO extends ProjectElemUpdateDTO {
-  constructor(entity, updatedEntityValues = {}) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}) {
+    super(entity, updatedValues, GetDTO);
   }
 }
 

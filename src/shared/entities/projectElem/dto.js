@@ -1,4 +1,9 @@
-import { BasicDeleteDTO, BasicGetDTO, BasicUpdateDTO } from "../basic/dto.js";
+import {
+  BasicGetDTO,
+  BasicCreateDTO,
+  BasicUpdateDTO,
+  BasicDeleteDTO,
+} from "../basic/dto.js";
 import { GetDTO as ProjectDTO } from "../../../entities/project/dto.js";
 
 export class ProjectElemGetDTO extends BasicGetDTO {
@@ -10,15 +15,15 @@ export class ProjectElemGetDTO extends BasicGetDTO {
   }
 }
 
-export class ProjectElemCreateDTO extends ProjectElemGetDTO {
+export class ProjectElemCreateDTO extends BasicCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, ProjectElemGetDTO);
   }
 }
 
 export class ProjectElemUpdateDTO extends BasicUpdateDTO {
-  constructor(entity, updatedEntityValues = {}, GetDTO = ProjectElemGetDTO) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}, GetDTO = ProjectElemGetDTO) {
+    super(entity, updatedValues, GetDTO, ProjectElemGetDTO);
   }
 }
 

@@ -10,27 +10,29 @@ export class BasicGetDTO {
   }
 }
 
-export class BasicCreateDTO extends BasicGetDTO {
-  constructor(entity) {
-    super(entity);
+export class BasicCreateDTO {
+  constructor(entity, GetDTO = BasicGetDTO) {
+    Object.assign(this, new GetDTO(entity));
   }
 }
 
 export class BasicUpdateDTO {
   // returns updated fields only
-  constructor(entity, queryEntityValues = {}, GetDTO = BasicGetDTO) {
-    const updatedEntityValues = {};
-    for (let key in queryEntityValues) {
-      updatedEntityValues[key] = entity[key];
-    }
-
-    const dto = new GetDTO({
-      ...new GetDTO(entity), // add id and dates
-      ...updatedEntityValues,
+  constructor(
+    entity,
+    updatedValues = {},
+    GetDTO = BasicGetDTO,
+    SharedElemGetDTO = BasicGetDTO
+  ) {
+    const resultKeys = Object.keys({
+      ...new SharedElemGetDTO(entity), // id and dates
+      ...updatedValues,
     });
 
+    const dto = new GetDTO(entity);
+
     for (let key in dto) {
-      if (dto[key] === undefined) delete dto[key];
+      if (!resultKeys.includes(key)) delete dto[key];
     }
 
     Object.assign(this, dto);
