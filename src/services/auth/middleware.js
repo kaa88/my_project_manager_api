@@ -9,19 +9,14 @@ function authMiddleware(req, res, next) {
       if (!accessToken)
         throw ApiError.unauthorized("Authorization token was not provided");
 
-      const tokenData = TokenService.validateAccessToken(accessToken);
-      if (!tokenData?.user_id)
+      const token = TokenService.validateAccessToken(accessToken);
+      if (!token.isValid || token.isExpired)
         throw ApiError.unauthorized("Invalid access token");
 
-      req.user.id = Number(tokenData.user_id);
-      // projectId: tokenData.project_id,
-      // boardId: tokenData.board_id,
-      // };
+      req.user.id = Number(token.data?.user_id);
+      req.user.email = token.data?.email;
     } else {
-      req.user.id = Number(req.query.userId); // || 2, //
-      // projectId: req.body.projectId || req.query.projectId,
-      // boardId: req.body.boardId || req.query.boardId,
-      // };
+      req.user.id = Number(req.query.userId);
     }
 
     if (!req.user.id) throw ApiError.unauthorized("User ID was not provided");

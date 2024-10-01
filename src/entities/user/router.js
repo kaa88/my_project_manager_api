@@ -4,31 +4,28 @@ import { controller } from "./controller.js";
 
 import authMiddleware from "../../services/auth/middleware.js";
 import nullValueMiddleware from "../../services/nullValueMiddleware.js";
-import queryParserMiddleware from "../../services/queryParserMiddleware.js";
 
-const middlewares = [
-  authMiddleware,
-  // userRoleMiddleware,
-  nullValueMiddleware,
-  queryParserMiddleware,
-];
+const middlewares = [authMiddleware, nullValueMiddleware];
 
+// const passwordValidationSettings = {
+//   minLength: 8,
+//   minLowercase: 1,
+//   minUppercase: 1,
+//   minNumbers: 1,
+//   minSymbols: 1,
+// };
+// temp
 const passwordValidationSettings = {
-  // temp
   minLength: 4,
   minLowercase: 0,
   minUppercase: 0,
   minNumbers: 0,
   minSymbols: 0,
-  // minLength: 8,
-  // minLowercase: 1,
-  // minUppercase: 1,
-  // minNumbers: 1,
-  // minSymbols: 1,
 };
 
 const router = express.Router();
 
+// CRUD
 router.post(
   "/create",
   body("email").isEmail(),
@@ -36,34 +33,47 @@ router.post(
   nullValueMiddleware,
   controller.create
 );
-router.patch("/update", ...middlewares, controller.update);
+// router.patch("/update", ...middlewares, controller.update);
 router.delete("/delete", ...middlewares, controller.delete);
 
-router.get("/one", ...middlewares, controller.findOne); // userController?
-router.get("/list", ...middlewares, controller.findMany); // userInfoController?
+router.get("/one", ...middlewares, controller.findOne);
+router.get("/list", ...middlewares, controller.findMany);
 
+// Email
+router.post(
+  "/change_email",
+  body("email").isEmail(),
+  ...middlewares,
+  controller.changeEmail
+);
+router.post("/verify_email", nullValueMiddleware, controller.verifyEmail);
+
+// Password
 router.post(
   "/change_password",
   body("newPassword").isStrongPassword(passwordValidationSettings),
   ...middlewares,
   controller.changePassword
 );
-router.post("/restore_password", controller.restorePassword);
+router.post(
+  "/restore_password",
+  nullValueMiddleware,
+  controller.restorePassword
+);
 router.post(
   "/restore_password_confirm",
   body("newPassword").isStrongPassword(passwordValidationSettings),
+  nullValueMiddleware,
   controller.restorePasswordConfirm
 );
 
-router.post("/verify", controller.verifyEmail);
-router.post("/login", controller.login);
-router.post("/logout", controller.logout);
+// Auth
+router.post("/login", nullValueMiddleware, controller.login);
+router.post("/logout", ...middlewares, controller.logout);
 router.post("/refresh", controller.refresh);
 
-router.post("/upload_image", controller.addPhoto);
-
-// update email
-// update cookie
+// Other
+router.post("/accept_cookies", ...middlewares, controller.acceptCookies);
 // update admin
 
 export default router;

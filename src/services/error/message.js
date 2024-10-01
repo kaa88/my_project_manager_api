@@ -45,9 +45,7 @@ export class Message {
   static validation(expressValidatorResult) {
     const textErrors = !isArray(expressValidatorResult.errors)
       ? ["Unknown error"]
-      : expressValidatorResult.errors.map(
-          (err) => `${err.msg} (${err.path}): '${err.value}'`
-        );
+      : expressValidatorResult.errors.map((err) => `${err.msg} (${err.path})`);
 
     return `Validation failed. ${textErrors.join("; ")}`;
   }

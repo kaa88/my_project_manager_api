@@ -16,10 +16,10 @@ export const db = {
     return response[0];
   },
 
-  async update({ model, query, values }) {
+  async update({ model, query, values, equal }) {
     checkDbQueryProps({ model, query, values });
 
-    const dbQuery = getDbWhereProps({ model, query }, true);
+    const dbQuery = getDbWhereProps({ model, query, equal }, true);
 
     const response = await instance
       .update(model)
@@ -29,10 +29,10 @@ export const db = {
     return response[0];
   },
 
-  async delete({ model, query }) {
+  async delete({ model, query, equal }) {
     checkDbQueryProps({ model, query });
 
-    const dbQuery = getDbWhereProps({ model, query }, true);
+    const dbQuery = getDbWhereProps({ model, query, equal }, true);
 
     const response = await instance
       .delete(model)
@@ -41,12 +41,12 @@ export const db = {
     return response[0];
   },
 
-  async findOne({ model, query }) {
+  async findOne({ model, query, equal }) {
     checkDbQueryProps({ model, query });
 
     const modelName = getModelName(model, instance);
     const dbQuery = {
-      ...getDbWhereProps({ model, query }, true),
+      ...getDbWhereProps({ model, query, equal }, true),
       ...getDbFieldSelectProps({ model, query }, true),
     };
 

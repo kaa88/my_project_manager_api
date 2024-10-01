@@ -63,6 +63,18 @@ CREATE TABLE IF NOT EXISTS "labels" (
 	"creator_id" integer NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "profiles" (
+	"_id" serial PRIMARY KEY NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
+	"first_name" text DEFAULT '' NOT NULL,
+	"last_name" text DEFAULT '' NOT NULL,
+	"avatar" text DEFAULT '' NOT NULL,
+	"status" text DEFAULT '' NOT NULL,
+	"user_id" integer NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "projects" (
 	"_id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -119,20 +131,10 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"is_cookie_accepted" boolean DEFAULT false NOT NULL,
 	"is_admin" boolean DEFAULT false NOT NULL,
 	"last_visit_at" timestamp DEFAULT now() NOT NULL,
-	"refresh_tokens" text[] NOT NULL,
+	"refresh_tokens" text[],
+	"password_restore_code" text DEFAULT '' NOT NULL,
+	"verification_code" text DEFAULT '' NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "usersInfo" (
-	"_id" serial PRIMARY KEY NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"deleted_at" timestamp,
-	"first_name" text DEFAULT '' NOT NULL,
-	"last_name" text DEFAULT '' NOT NULL,
-	"avatar" text DEFAULT '' NOT NULL,
-	"status" text DEFAULT '' NOT NULL,
-	"user_id" integer NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -184,6 +186,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users__id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "tasks" ADD CONSTRAINT "tasks_project_id_projects__id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -197,12 +205,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "teams" ADD CONSTRAINT "teams_project_id_projects__id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("_id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "usersInfo" ADD CONSTRAINT "usersInfo_user_id_users__id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

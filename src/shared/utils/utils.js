@@ -22,10 +22,7 @@ export const isNullishData = (x) =>
   (isArray(x) && !x.length) ||
   (isObject(x) && isEmptyObject(x));
 
-export const toNumber = (x) => {
-  const num = Number(x);
-  return isNaN(num) ? 0 : num;
-};
+export const toNumber = (x) => (isNaN(x) ? 0 : Number(x));
 
 export const toNumberArray = (x) => {
   const arr = isArray(x) ? x : [x];
@@ -40,6 +37,19 @@ export const toNumberOrNull = (x) => (isNullish(x) ? null : toNumber(x));
 
 export const toNumberArrayOrNull = (x) =>
   isNullish(x) ? null : toNumberArray(x);
+
+/** Func does not convert types, non-string values will be skipped. */
+export const toStringArray = (x) => {
+  const arr = isArray(x) ? x : [x];
+  let result = [];
+  arr.forEach((item) => {
+    result = result.concat(typeof item === "string" ? item.split(",") : [item]);
+  });
+  return result.reduce((res, item) => {
+    const str = typeof item === "string" ? item.trim() : "";
+    return str ? [...res, str] : res;
+  }, []);
+};
 
 export const toBoolean = (x) => (isTotallyNullish(x) ? false : Boolean(x));
 

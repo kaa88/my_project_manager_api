@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { ApiError } from "../error/index.js";
+import { ApiError, Message } from "../error/index.js";
 import { isEmptyObject } from "../../shared/utils/utils.js";
 import { parsePeriod } from "./utils.js";
 
@@ -11,7 +11,17 @@ const GENERATION_ERROR = ApiError.internal(
 );
 
 export const TokenService = {
-  generateTokens(data = {}) {
+  generateTokens(userId, email) {
+    if (typeof userId !== "number" && !userId)
+      throw ApiError.internal(Message.incorrect("userId", "Number notNull"));
+    if (typeof email !== "string" && !email)
+      throw ApiError.internal(Message.incorrect("email", "String notNull"));
+
+    const data = {
+      user_id: userId,
+      email: email,
+    };
+
     return {
       accessToken: this.generateAccessToken(data),
       refreshToken: this.generateRefreshToken(data),
@@ -63,16 +73,23 @@ export const TokenService = {
 };
 
 function validateToken(token, key) {
-  try {
-    const cleanToken = token.split(" ")[1]; // trim Bearer
-    if (!cleanToken || !key)
-      throw ApiError.badRequest(
-        "Validation failed: missing token or secret key."
-      );
+  const cleanToken = token.split(" ")[1]; // trim Bearer
+  if (!cleanToken || !key)
+    throw ApiError.badRequest(
+      "Validation failed: missing token or secret key."
+    );
 
-    const tokenData = jwt.verify(cleanToken, key);
-    return tokenData;
+  const verifiedToken = {};
+  try {
+    const { iat, exp, ...tokenData } = jwt.verify(cleanToken, key, {
+      ignoreExpiration: true,
+    });
+    verifiedToken.data = tokenData;
+    verifiedToken.isValid = true;
+    verifiedToken.isExpired = (exp || 0) * 1000 < Date.now();
   } catch (e) {
-    return e.isApiError ? e : ApiError.unauthorized("Invalid token");
+    verifiedToken.isValid = false;
+    verifiedToken.isExpired = true;
   }
+  return verifiedToken;
 }

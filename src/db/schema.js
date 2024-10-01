@@ -5,6 +5,7 @@ export * from "../entities/board/modelRelations.js";
 export * from "../entities/comment/model.js";
 export * from "../entities/file/model.js";
 export * from "../entities/label/model.js";
+export * from "../entities/profile/model.js";
 export * from "../entities/project/model.js";
 export * from "../entities/project/modelRelations.js";
 export * from "../entities/task/model.js";

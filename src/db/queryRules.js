@@ -6,7 +6,7 @@ import { isArray } from "../shared/utils/utils.js";
 const EXCLUDED_PROPS = ["limit", "offset", "order", "orderBy"];
 
 // This func generates chunks with rules for DB query.
-export const getRulesFromQuery = ({ model, query }, propsChecked) => {
+export const getRulesFromQuery = ({ model, query, equal }, propsChecked) => {
   if (!propsChecked) checkDbQueryProps({ model, query });
 
   return Object.entries(query).map(([key, value]) => {
@@ -18,7 +18,8 @@ export const getRulesFromQuery = ({ model, query }, propsChecked) => {
 
     if (value === null) return isNull(column);
 
-    if (columnType === "string") return ilike(column, `%${value}%`);
+    if (columnType === "string")
+      return equal ? eq(column, value) : ilike(column, `%${value}%`);
 
     if (columnType === "number")
       return isArray(value)

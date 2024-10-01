@@ -9,6 +9,7 @@ import taskRouter from "../entities/task/router.js";
 // import taskListRouter from "../entities/taskList/router.js";
 import teamRouter from "../entities/team/router.js";
 import userRouter from "../entities/user/router.js";
+import profileRouter from "../entities/profile/router.js";
 import teamsToBoardsRouter from "../entities/_relationTables/teamsToBoards/router.js";
 import authCheckRouter from "../services/auth/authCheck.js";
 
@@ -22,7 +23,9 @@ mainRouter.use("/project", projectRouter);
 mainRouter.use("/task", taskRouter);
 // mainRouter.use("/tasklist", taskListRouter);
 mainRouter.use("/team", teamRouter);
+
 mainRouter.use("/user", userRouter);
+mainRouter.use("/profile", profileRouter);
 
 mainRouter.use("/teams_to_boards", teamsToBoardsRouter);
 

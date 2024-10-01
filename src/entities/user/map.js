@@ -1,12 +1,15 @@
-import {
-  BasicDeleteDTO,
-  BasicGetDTO,
-  BasicUpdateDTO,
-} from "../../shared/entities/basic/dto.js";
+import { ApiError, Message } from "../../services/error/index.js";
 import { BasicEntity } from "../../shared/entities/basic/entity.js";
-import { toBoolean } from "../../shared/utils/utils.js";
+import {
+  BasicGetDTO,
+  BasicCreateDTO,
+  BasicUpdateDTO,
+  BasicDeleteDTO,
+} from "../../shared/entities/basic/dto.js";
+import { GetDTO as ProfileDTO } from "../profile/map.js";
+import { isArray, toBoolean } from "../../shared/utils/utils.js";
 
-export class User extends BasicEntity {
+export class Entity extends BasicEntity {
   constructor(data = {}) {
     super(data);
     if (data.email !== undefined) this.email = data.email;
@@ -16,45 +19,43 @@ export class User extends BasicEntity {
     if (data.isCookieAccepted !== undefined)
       this.isCookieAccepted = toBoolean(data.isCookieAccepted);
     if (data.isAdmin !== undefined) this.isAdmin = toBoolean(data.isAdmin);
-  }
-}
+    if (data.lastVisitAt !== undefined) this.lastVisitAt = data.lastVisitAt;
 
-export class UserInfo extends BasicEntity {
-  // не знаю как эти классы разделить в запросах (сделать userController и userInfoController?)
-  constructor(data = {}) {
-    super(data);
-    if (data.firstName !== undefined) this.firstName = data.firstName;
-    if (data.lastName !== undefined) this.lastName = data.lastName;
-    if (data.avatar !== undefined) this.avatar = data.avatar;
-    if (data.status !== undefined) this.status = data.status;
+    if (data.refreshTokens !== undefined) {
+      if (!isArray(data.refreshTokens))
+        throw ApiError.badRequest(Message.incorrect("refreshTokens", "Array"));
+      this.refreshTokens = data.refreshTokens;
+    }
+
+    if (data.passwordRestoreCode !== undefined)
+      this.passwordRestoreCode = data.passwordRestoreCode || "";
+    if (data.verificationCode !== undefined)
+      this.verificationCode = data.verificationCode || "";
   }
 }
 
 export class GetDTO extends BasicGetDTO {
   constructor(entity, isShortResult) {
     super(entity, isShortResult);
-    this.email = entity.email || entity.user?.email;
+    this.email = entity.email;
     if (!isShortResult) {
       this.isEmailVerified = entity.isEmailVerified;
       this.isCookieAccepted = entity.isCookieAccepted;
       this.isAdmin = entity.isAdmin;
-      this.userInfoId = entity.userInfoId; // temp
     }
-    this.firstName = entity.firstName;
-    this.lastName = entity.lastName;
-    this.avatar = entity.avatar;
-    this.status = entity.status;
+    // relations:
+    if (entity.profile) this.profile = new ProfileDTO(entity.profile, true);
   }
 }
-export class CreateDTO extends GetDTO {
+export class CreateDTO extends BasicCreateDTO {
   constructor(entity) {
-    super(entity);
+    super(entity, GetDTO);
   }
 }
 
 export class UpdateDTO extends BasicUpdateDTO {
-  constructor(entity, updatedEntityValues = {}) {
-    super(entity, updatedEntityValues, GetDTO);
+  constructor(entity, updatedValues = {}) {
+    super(entity, updatedValues, GetDTO);
   }
 }
 
