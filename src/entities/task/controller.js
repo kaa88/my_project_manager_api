@@ -12,3 +12,15 @@ export const controller = new BoardElemController({
     delete: DeleteDTO,
   },
 });
+
+controller.handlers.create = new CreateHandler(controller.handlers.create);
+controller.createControllsFromHandlers();
+
+function CreateHandler(protoHandler) {
+  return async (req) => {
+    req.body.assigneeIds = req.body.assigneeIds || [];
+    req.body.labelIds = req.body.labelIds || [];
+
+    return await protoHandler(req);
+  };
+}

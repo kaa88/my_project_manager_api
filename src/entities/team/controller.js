@@ -24,6 +24,7 @@ controller.handlers.create = new CreateHandler(controller.handlers.create);
 controller.handlers.update = new UpdateHandler(controller.handlers.update);
 controller.handlers.delete = new DeleteHandler(controller.handlers.delete);
 controller.handlers.findOne = new FindOneHandler(controller.handlers.findOne);
+// findMany is default
 controller.createControllsFromHandlers();
 
 /* Access
@@ -39,13 +40,13 @@ function CreateHandler(protoHandler) {
     const protoDTO = await protoHandler(req);
 
     if (req.body.boardIds !== undefined) {
-      const relationsResponse = await handleRelationsOnCreate(
+      const boardIds = await handleRelationsOnCreate(
         MODEL_NAME.team,
         protoDTO,
         req.body.boardIds
       );
-      Object.assign(protoDTO, relationsResponse);
-    } else protoDTO.boardIds = null;
+      Object.assign(protoDTO, boardIds);
+    } else protoDTO.boardIds = [];
 
     return protoDTO;
   };
@@ -56,12 +57,12 @@ function UpdateHandler(protoHandler) {
     const protoDTO = await protoHandler(req);
 
     if (req.body.boardIds !== undefined) {
-      const relationsResponse = await handleRelationsOnUpdate(
+      const boardIds = await handleRelationsOnUpdate(
         MODEL_NAME.team,
         protoDTO,
         req.body.boardIds
       );
-      Object.assign(protoDTO, relationsResponse);
+      Object.assign(protoDTO, boardIds);
     }
 
     return protoDTO;
@@ -72,11 +73,8 @@ function DeleteHandler(protoHandler) {
   return async (req) => {
     const protoDTO = await protoHandler(req);
 
-    const relationsResponse = await handleRelationsOnDelete(
-      MODEL_NAME.team,
-      protoDTO
-    );
-    Object.assign(protoDTO, relationsResponse);
+    const boardIds = await handleRelationsOnDelete(MODEL_NAME.team, protoDTO);
+    Object.assign(protoDTO, boardIds);
 
     return protoDTO;
   };
@@ -86,11 +84,8 @@ function FindOneHandler(protoHandler) {
   return async (req) => {
     const protoDTO = await protoHandler(req);
 
-    const relationsResponse = await handleRelationsOnGet(
-      MODEL_NAME.team,
-      protoDTO
-    );
-    Object.assign(protoDTO, relationsResponse);
+    const boardIds = await handleRelationsOnGet(MODEL_NAME.team, protoDTO);
+    Object.assign(protoDTO, boardIds);
 
     return protoDTO;
   };

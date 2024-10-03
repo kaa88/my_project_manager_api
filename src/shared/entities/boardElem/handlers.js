@@ -1,4 +1,3 @@
-import { ApiError, Message } from "../../../services/error/index.js";
 import { db } from "../../../db/db.js";
 import { BasicHandlers } from "../basic/handlers.js";
 import { BoardElemEntity } from "./entity.js";
@@ -29,11 +28,14 @@ function CreateHandler(model, protoHandler) {
     req.board = await getCurrentBoard(req.body.boardId, req.body.projectId);
     checkWriteAccess(req);
 
-    req.body.id = await db.generateId({
+    req.body.creatorId = req.user.id || req.query.userId || req.body.creatorId;
+
+    req.body.relativeId = await db.generateId({
       model,
       query: { projectId: req.body.projectId, boardId: req.body.boardId },
+      idName: "relativeId",
     });
-    req.body.creatorId = req.user.id || req.query.userId || req.body.creatorId;
+    // TODO: relativeId duplicate check
 
     return await protoHandler(req);
   };
@@ -48,8 +50,11 @@ function UpdateHandler(model, protoHandler) {
     );
     checkWriteAccess(req);
 
+    delete req.body.relativetId;
     delete req.body.projectId;
     delete req.body.boardId;
+    delete req.body.creatorId;
+
     return await protoHandler(req);
   };
 }
@@ -92,82 +97,12 @@ function FindManyHandler(model, protoHandler) {
 
 //
 
-// const setQueryIds = (req) => {
-//   req.queryIds = req.queryIds || {};
-//   if (!req.queryIds.boardId)
-//     req.queryIds = getIdsFromQuery(["id", "projectId", "boardId"], req.query);
-// };
-
-// const setQueryIds = (req) => {
-//   const desiredIds = [];
-//   if (req.id) desiredIds.push("id");
-//   if (!req.id || req.relativeId || req.projectId || req.boardId)
-//     desiredIds.push("relativeId", "projectId", "boardId");
-
-//   if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
-// };
 const setQueryIds = (req) => {
-  const desiredIds = ["projectId", "boardId"];
-  if (req.id) desiredIds.push("id");
-  if (!req.id || req.relativeId) desiredIds.push("relativeId");
-
-  if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
+  req.queryIds = req.queryIds || {};
+  if (!req.queryIds.id || !req.queryIds.projectId || !req.queryIds.boardId) {
+    const ids = getIdsFromQuery(["id", "projectId", "boardId"], req.query);
+    req.queryIds.id = req.queryIds.id || ids.id;
+    req.queryIds.projectId = req.queryIds.projectId || ids.projectId;
+    req.queryIds.boardId = req.queryIds.boardId || ids.boardId;
+  }
 };
-
-///////////////////////
-
-// function CreateHandler(model, protoHandler) {
-//   return async (req) => {
-//     const { projectId, boardId } = getIdsFromQuery(
-//       ["projectId", "boardId"],
-//       req.body
-//     );
-
-//     const board = await db.findOne({
-//       model: boardModel,
-//       query: { id: boardId, projectId },
-//     });
-
-//     if (!board || board.deletedAt)
-//       throw ApiError.badRequest(
-//         `Board with id=${boardId} and projectId=${projectId} does not exist`
-//       );
-
-//     req.body.id = await db.generateId({
-//       model,
-//       query: { projectId, boardId },
-//     });
-
-//     return await protoHandler(req);
-//   };
-// }
-
-// function UpdateHandler(model, protoHandler) {
-//   const handle = new FindOneHandler(model, protoHandler);
-//   return async (req) => {
-//     delete req.body.boardId;
-//     handle(req);
-//   };
-// }
-
-// function FindOneHandler(model, protoHandler) {
-//   return async (req) => {
-//     return await protoHandler(req);
-//   };
-// }
-
-// function FindManyHandler(model, protoHandler) {
-//   return async (req) => {
-//     checkIdsInQuery(["projectId", "boardId"], req.query);
-//     return await protoHandler(req);
-//   };
-// }
-
-// const setQueryIds = (req) => {
-//   req.queryIds = req.queryIds || {};
-//   req.queryIds.boardId = getIdsFromQuery(["id", "projectId", "boardId"], {
-//     ...req.query,
-//     ...req.params,
-//   }).boardId;
-//   return req.queryIds;
-// };

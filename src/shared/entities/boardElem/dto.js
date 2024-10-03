@@ -15,8 +15,8 @@ export class BoardElemGetDTO extends ProjectElemGetDTO {
 }
 
 export class BoardElemCreateDTO extends ProjectElemCreateDTO {
-  constructor(entity) {
-    super(entity, BoardElemGetDTO);
+  constructor(entity, GetDTO = BoardElemGetDTO) {
+    super(entity, GetDTO);
   }
 }
 
