@@ -1,5 +1,5 @@
-import { ApiError } from "./error/index.js";
-import { isNullishData, isObject } from "../shared/utils/utils.js";
+import { ApiError } from "../error/index.js";
+import { isNullishData, isObject } from "../../shared/utils/utils.js";
 
 function nullValueMiddleware(req, res, next) {
   try {

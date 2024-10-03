@@ -2,17 +2,10 @@ import express from "express";
 import { ApiError, Message } from "../../../services/error/index.js";
 import { isArray, isEmptyObject, isObject } from "../../utils/utils.js";
 
-import nullValueMiddleware from "../../../services/nullValueMiddleware.js";
-// import queryParserMiddleware from "../../../services/queryParserMiddleware.js";
 import authMiddleware from "../../../services/auth/middleware.js";
-// import userRoleMiddleware from "../../../services/userRoles/middleware.js";
+import nullValueMiddleware from "../../../services/query/nullValueMiddleware.js";
 
-const middlewares = [
-  authMiddleware,
-  // userRoleMiddleware,
-  nullValueMiddleware,
-  // queryParserMiddleware,
-];
+const middlewares = [authMiddleware, nullValueMiddleware];
 
 export function BasicRouter({ controller, omit = [] }) {
   if (!isObject(controller) || isEmptyObject(controller))

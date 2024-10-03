@@ -2,7 +2,7 @@ import { BasicRouter } from "../../shared/entities/basic/router.js";
 import { controller } from "./controller.js";
 
 import authMiddleware from "../../services/auth/middleware.js";
-import nullValueMiddleware from "../../services/nullValueMiddleware.js";
+import nullValueMiddleware from "../../services/query/nullValueMiddleware.js";
 
 const middlewares = [authMiddleware, nullValueMiddleware];
 

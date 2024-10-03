@@ -3,7 +3,7 @@ import { toNumberArray } from "../../utils/utils.js";
 export class BasicEntity {
   constructor(data = {}) {
     if (data.id !== undefined) {
-      const ids = toNumberArray(data.id).filter((id) => id);
+      const ids = toNumberArray(data.id);
       if (!ids.length) this.id = undefined;
       else if (ids.length === 1) this.id = ids[0];
       else this.id = ids;

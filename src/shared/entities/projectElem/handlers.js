@@ -1,4 +1,3 @@
-import { ApiError, Message } from "../../../services/error/index.js";
 import { db } from "../../../db/db.js";
 import { BasicHandlers } from "../basic/handlers.js";
 import { ProjectElemEntity } from "./entity.js";
@@ -8,7 +7,6 @@ import {
   getCurrentProject,
 } from "./utils.js";
 import { checkIdsInQuery, getIdsFromQuery } from "../../utils/idsFromQuery.js";
-import { isArray } from "../../utils/utils.js";
 
 export class ProjectElemHandlers extends BasicHandlers {
   constructor({ model, entity = ProjectElemEntity, dto = {} }) {
@@ -33,24 +31,16 @@ function CreateHandler(model, protoHandler) {
     req.project = await getCurrentProject(req.body.projectId);
     checkWriteAccess(req);
 
+    req.body.creatorId = req.user.id || req.query.userId || req.body.creatorId;
+
     req.body.relativeId = await db.generateId({
       model,
       query: { projectId: req.body.projectId },
       idName: "relativeId",
     });
-    req.body.creatorId = req.user.id || req.query.userId || req.body.creatorId;
+    // TODO: relativeId duplicate check
 
-    const protoDTO = await protoHandler(req);
-
-    // ?
-    const elemsCount = await db.count({
-      model,
-      query: { projectId: req.body.projectId, relativeId: req.body.relativeId },
-    });
-    console.log("--- elements with same 'relativeId:", elemsCount);
-    //
-
-    return protoDTO;
+    return await protoHandler(req);
   };
 }
 
@@ -60,7 +50,10 @@ function UpdateHandler(model, protoHandler) {
     req.project = await getCurrentProject(req.queryIds.projectId);
     checkWriteAccess(req);
 
+    delete req.body.relativetId;
     delete req.body.projectId;
+    delete req.body.creatorId;
+
     return await protoHandler(req);
   };
 }
@@ -97,24 +90,11 @@ function FindManyHandler(model, protoHandler) {
 
 //
 
-// const setQueryIds = (req) => {
-//   req.queryIds = req.queryIds || {};
-//   if (!req.queryIds.projectId)
-//     req.queryIds = getIdsFromQuery(["id", "projectId"], req.query);
-// };
-
-// const setQueryIds = (req) => {
-//   const desiredIds = [];
-//   if (req.id) desiredIds.push("id");
-//   if (!req.id || req.relativeId || req.projectId)
-//     desiredIds.push("relativeId", "projectId");
-
-//   if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
-// };
 const setQueryIds = (req) => {
-  const desiredIds = ["projectId"];
-  if (req.query.id) desiredIds.push("id");
-  if (!req.query.id || req.relativeId) desiredIds.push("relativeId");
-
-  if (!req.queryIds) req.queryIds = getIdsFromQuery(desiredIds, req.query);
+  req.queryIds = req.queryIds || {};
+  if (!req.queryIds.id || !req.queryIds.projectId) {
+    const ids = getIdsFromQuery(["id", "projectId"], req.query);
+    req.queryIds.id = req.queryIds.id || ids.id;
+    req.queryIds.projectId = req.queryIds.projectId || ids.projectId;
+  }
 };

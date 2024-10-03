@@ -3,24 +3,16 @@ import { body } from "express-validator";
 import { controller } from "./controller.js";
 
 import authMiddleware from "../../services/auth/middleware.js";
-import nullValueMiddleware from "../../services/nullValueMiddleware.js";
+import nullValueMiddleware from "../../services/query/nullValueMiddleware.js";
 
 const middlewares = [authMiddleware, nullValueMiddleware];
 
-// const passwordValidationSettings = {
-//   minLength: 8,
-//   minLowercase: 1,
-//   minUppercase: 1,
-//   minNumbers: 1,
-//   minSymbols: 1,
-// };
-// temp
 const passwordValidationSettings = {
-  minLength: 4,
-  minLowercase: 0,
-  minUppercase: 0,
-  minNumbers: 0,
-  minSymbols: 0,
+  minLength: 8,
+  minLowercase: 1,
+  minUppercase: 1,
+  minNumbers: 1,
+  minSymbols: 1,
 };
 
 const router = express.Router();

@@ -25,7 +25,7 @@ export const handleRelationsOnCreate = async (
         getModelProps(currentModelName, responseIds, id)
       ),
     });
-    result[oppositeModelName + "Ids"] = newIds.length ? newIds : null;
+    result[oppositeModelName + "Ids"] = newIds.length ? newIds : [];
   } catch (e) {
     result = await handleRelationError(e, currentModelName, responseIds);
   }
@@ -63,7 +63,7 @@ export const handleRelationsOnUpdate = async (
         ),
       });
     }
-    result[oppositeModelName + "Ids"] = newIds.length ? newIds : null;
+    result[oppositeModelName + "Ids"] = newIds.length ? newIds : [];
   } catch (e) {
     result = await handleRelationError(e, currentModelName, responseIds);
   }
@@ -108,7 +108,7 @@ const getExistingIds = async (currentModelName, responseIds) => {
   });
 
   const ids = relations.items.map((rel) => rel[oppositeModelName + "Id"]);
-  return ids.length ? ids : null;
+  return ids.length ? ids : [];
 };
 
 const handleRelationError = async (error, currentModelName, responseIds) => {

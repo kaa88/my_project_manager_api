@@ -1,4 +1,3 @@
-import { ApiError, Message } from "../../services/error/index.js";
 import { BasicController } from "../../shared/entities/basic/controller.js";
 import { controller as boardController } from "../board/controller.js";
 import { controller as labelController } from "../label/controller.js";
@@ -43,9 +42,8 @@ get - project member
 */
 
 function CreateHandler(protoHandler) {
-  const AUTO_CREATE_BOARD = false;
-  const AUTO_CREATE_LABEL = false;
-  // create team ?
+  const AUTO_CREATE_BOARD = true;
+  const AUTO_CREATE_LABEL = true;
 
   return async (req) => {
     req.body.ownerId = req.user.id || req.query.userId || req.body.ownerId;
@@ -61,21 +59,36 @@ function CreateHandler(protoHandler) {
       req.body.memberIds = [
         ...new Set([...req.body.memberIds, ...(req.body.adminIds || [])]),
       ];
-    }
+    } else req.body.adminIds = [];
 
     const protoDTO = await protoHandler(req);
 
     req.body.projectId = protoDTO.id;
+    let errorMessage = "";
 
     if (AUTO_CREATE_BOARD && boardController?.handlers?.create) {
       req.body.title = "Board";
       req.body.description = "Your first board";
-      await boardController.handlers.create(req);
+      try {
+        await boardController.handlers.create(req);
+      } catch (e) {
+        const message = `Error creating 'board': ${e.message}. `;
+        console.log(message);
+        errorMessage += message;
+      }
     }
     if (AUTO_CREATE_LABEL && labelController?.handlers?.create) {
       req.body.title = "Label";
-      await labelController.handlers.create(req);
+      delete req.body.description;
+      try {
+        await labelController.handlers.create(req);
+      } catch (e) {
+        const message = `Error creating 'label': ${e.message}. `;
+        console.log(message);
+        errorMessage += message;
+      }
     }
+    if (errorMessage) protoDTO.message = errorMessage;
 
     return protoDTO;
   };
@@ -128,5 +141,3 @@ function FindManyHandler(protoHandler) {
     return await protoHandler(req);
   };
 }
-
-// function SetCurrentProject(protoHandler) {} // или это в юзера?

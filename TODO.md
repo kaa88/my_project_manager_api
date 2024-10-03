@@ -1,13 +1,8 @@
 # TODO
 - add cache middleware ?
 - проверка инпутов на хакеров
-- на будущее - при гет делается 2 запроса к серверу (get + count), объединить в один через drizzle sql`` или еще как-то
 - на будущее - добавить swagger/openapi
-- dto должен возвращать все поля, даже пустые... сделать опциональный midware, который будет "сжимать траффик", удаляя пустые поля
-- в табл teamsToBoards тоже надо добавить projectId?
 - ??? taskList тоже сделать projectElem, т.к. менять его может project admin ? или удалить и сделать в борде json по типу subtask
-- убрать refresh из кук, и сделать обратно в localstorage
-- БД не поддерживает .default([]), надо переходить обратно на null
 
 # Задачи бэк
 + базовые компоненты приложения (index.js, express settings, router)
@@ -17,8 +12,8 @@
 
 + система многоуровневых сущностей (id - projectId - boardId)
 + basic elem module
-- projectElem module
-- boardElem module
++ projectElem module
++ boardElem module
 
 + user - создание, удаление, изменение
 + авторизация (login, logout), токены, куки, рефреш (еще проверить вкл и выкл middleware)
@@ -29,14 +24,14 @@
 - загрузка фото
 - реализация демо пользователя
 
-- projects - реализация и проверка всех сценариев
-- labels - реализация и проверка всех сценариев
-- teams - реализация и проверка всех сценариев, кроме relations
-- boards - реализация и проверка всех сценариев, кроме relations
-- boards & teams relations
-- task - реализация и проверка всех сценариев
-- comment - реализация и проверка всех сценариев
-- file - реализация и проверка всех сценариев
++ projects - реализация и проверка всех сценариев
++ labels - реализация и проверка всех сценариев
++ teams - реализация и проверка всех сценариев, кроме relations
++ boards - реализация и проверка всех сценариев, кроме relations
++ boards & teams relations
++ task - реализация и проверка всех сценариев
++ comment - реализация и проверка всех сценариев
++ file - реализация и проверка всех сценариев
 
 - поиск
 
@@ -83,7 +78,7 @@
 - project sys name ?
 
 # test db
-users - id 1,2,3
+users - id 1,2,3,4,5
 projects
   id 1, owner 1, admins 0, members 1,4
   id 2, owner 1, admins 2, members 1,2,5

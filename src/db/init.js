@@ -3,7 +3,10 @@ import { sql } from "@vercel/postgres";
 
 import * as schema from "./schema.js";
 
-const instance = drizzle(sql, { schema, logger: true });
+const instance = drizzle(sql, {
+  schema,
+  logger: process.env.DB_LOGGER === "true",
+});
 
 // console.log(instance);
 

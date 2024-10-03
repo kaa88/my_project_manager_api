@@ -82,9 +82,6 @@ function UpdateHandler(model, Entity, UpdateDTO) {
     const response = await db.update({ model, query, values });
     if (!response) throw ApiError.notFound(Message.notFound(query));
 
-    console.log(response, values);
-    console.log(new UpdateDTO(response, values));
-
     return new UpdateDTO(response, values);
   };
 }
@@ -113,14 +110,11 @@ function FindOneHandler(model, Entity, GetDTO) {
       ...req.queryIds,
     };
 
-    console.log({ ...query, ...new FieldSelectParams(req.query) });
     const response = await db.findOne({
       model,
       query: { ...query, ...new FieldSelectParams(req.query) },
     });
     if (!response) throw ApiError.notFound(Message.notFound(query));
-
-    console.log(response);
 
     return new GetDTO(response);
   };
@@ -146,5 +140,6 @@ function FindManyHandler(model, Entity, GetDTO) {
 //
 
 const setQueryIds = (req) => {
-  if (!req.queryIds) req.queryIds = getIdsFromQuery(["id"], req.query);
+  req.queryIds = req.queryIds || {};
+  if (!req.queryIds.id) req.queryIds.id = getIdsFromQuery(["id"], req.query).id;
 };

@@ -7,6 +7,7 @@ import {
 } from "../../shared/entities/projectElem/dto.js";
 import { GetDTO as TeamsToBoardsDTO } from "../_relationTables/teamsToBoards/map.js";
 import {
+  isArray,
   toNumberArrayOrNull,
   toNumberOrNull,
 } from "../../shared/utils/utils.js";

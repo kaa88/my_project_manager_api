@@ -1,5 +1,5 @@
-const MailService = {
+// const MailService = {
 
-}
+// }
 
-export default MailService
+// export default MailService

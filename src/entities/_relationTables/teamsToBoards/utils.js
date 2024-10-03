@@ -50,7 +50,6 @@ export const getModelProps = (
   responseIds,
   oppositeValue
 ) => ({
-  projectId: responseIds.projectId,
   teamId: currentModelName === MODEL_NAME.team ? responseIds.id : oppositeValue,
   boardId:
     currentModelName === MODEL_NAME.board ? responseIds.id : oppositeValue,

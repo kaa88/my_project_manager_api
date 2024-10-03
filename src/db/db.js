@@ -99,6 +99,6 @@ export const db = {
     if (model[idName]) dbQuery.columns = { [idName]: true };
 
     const response = await instance.query[modelName].findMany(dbQuery);
-    return getSerialId(response.map((item) => item.id));
+    return getSerialId(response.map((item) => item[idName]));
   },
 };
