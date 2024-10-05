@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import { ApiError, Message } from "../../services/error/index.js";
 import { db } from "../../db/db.js";
 import { TokenService } from "../../services/auth/TokenService.js";
+import { MailService } from "../../services/mail/MailService.js";
 import { BasicController } from "../../shared/entities/basic/controller.js";
 import { controller as profileController } from "../profile/controller.js";
 import { users as model } from "./model.js";
@@ -114,7 +115,11 @@ function CreateHandler(protoHandler) {
     }
 
     // Send verification email
-    console.log("verificationCode", req.body.verificationCode);
+    try {
+      MailService.sendVerificationCode(email, req.body.verificationCode);
+    } catch (e) {
+      console.log(e.message);
+    }
 
     res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
@@ -200,21 +205,23 @@ function ChangeEmailHandler(protoHandler) {
       email
     );
 
-    const verificationCode = getRandomId(40);
-
     req.body = {
       email,
       refreshTokens: [refreshToken],
       isEmailVerified: false,
-      verificationCode,
+      verificationCode: getRandomId(40),
     };
     const protoDTO = await protoHandler(req);
 
     const response = { data: protoDTO, refreshToken };
     if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
 
-    // send email
-    console.log("verificationCode", verificationCode);
+    // Send verification email
+    try {
+      MailService.sendVerificationCode(email, req.body.verificationCode, true);
+    } catch (e) {
+      console.log(e.message);
+    }
 
     res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
@@ -293,10 +300,12 @@ function RestorePasswordHandler() {
     });
 
     if (response) {
-      // send email
-      console.log(
-        `Sending reset instructions to ${email} with link ${passwordRestoreCode}`
-      );
+      // Send email
+      try {
+        MailService.sendPasswordRestoreCode(email, passwordRestoreCode);
+      } catch (e) {
+        console.log(e.message);
+      }
     }
 
     return { message: "Instructions have been sent to an email" }; // send anyway
