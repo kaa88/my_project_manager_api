@@ -52,22 +52,14 @@ export const TokenService = {
     return [
       "access_token",
       token,
-      {
-        maxAge: parsePeriod(ACCESS_TOKEN_EXPIRE_PERIOD),
-        httpOnly: true,
-        secure: true,
-      },
+      getCookieSettings(parsePeriod(ACCESS_TOKEN_EXPIRE_PERIOD)),
     ];
   },
   getRefreshCookie(token = "null") {
     return [
       "refresh_token",
       token,
-      {
-        maxAge: parsePeriod(REFRESH_TOKEN_EXPIRE_PERIOD),
-        httpOnly: true,
-        secure: true,
-      },
+      getCookieSettings(parsePeriod(REFRESH_TOKEN_EXPIRE_PERIOD)),
     ];
   },
 };
@@ -93,3 +85,12 @@ function validateToken(token, key) {
   }
   return verifiedToken;
 }
+
+const getCookieSettings = (maxAge = 0) => {
+  return {
+    maxAge,
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+};
