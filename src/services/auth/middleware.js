@@ -5,7 +5,7 @@ function authMiddleware(req, res, next) {
   req.user = {};
   try {
     if (process.env.USE_AUTHORIZATION === "true") {
-      const accessToken = req.cookies.access_token;
+      const accessToken = req.headers.authorization;
       if (!accessToken)
         throw ApiError.unauthorized("Authorization token was not provided");
 

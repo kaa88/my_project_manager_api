@@ -58,7 +58,7 @@ get many - any user
 */
 
 const HASH_SALT = 5;
-const ADD_ACCESS_TOKEN_TO_RESPONSE = false;
+const ADD_ACCESS_TOKEN_TO_RESPONSE = true;
 
 function CreateHandler(protoHandler) {
   return async (req, res) => {
@@ -121,7 +121,6 @@ function CreateHandler(protoHandler) {
       console.log(e.message);
     }
 
-    res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
   };
 }
@@ -223,7 +222,6 @@ function ChangeEmailHandler(protoHandler) {
       console.log(e.message);
     }
 
-    res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
   };
 }
@@ -280,7 +278,6 @@ function ChangePasswordHandler(protoHandler) {
     const response = { data: protoDTO, refreshToken };
     if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
 
-    res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
   };
 }
@@ -396,7 +393,6 @@ function LoginHandler() {
     const response = { data: new GetDTO(updateResponse), refreshToken };
     if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
 
-    res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
   };
 }
@@ -415,9 +411,6 @@ function LogoutHandler() {
         values: { refreshTokens: [] },
       });
     }
-
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
 
     return { message: "Successfully logged out" };
   };
@@ -483,7 +476,6 @@ function RefreshHandler() {
     const response = { message: "Token has been refreshed", refreshToken };
     if (ADD_ACCESS_TOKEN_TO_RESPONSE) response.accessToken = accessToken;
 
-    res.cookie(...TokenService.getAccessCookie(accessToken));
     return response;
   };
 }
